@@ -10,7 +10,7 @@ library(FSA)
 #1 LOAD THE DATA
 #-------------------------------------------------------------------------------
 fileList <- list.files(paste0(file_base, "Intersection_CT_RD/"))
-fileList <- fileList[12:15]
+#fileList <- fileList[1]
 
 for(files in fileList){
         print(files)
@@ -27,15 +27,16 @@ for(files in fileList){
         df <- df[df$cloudType != 7,] #cirrus
         
         #draw a sample of the valid data values
-        #when there are less than 1000 entries take all of them 
-        # set.seed(121212)
-        # if(nrow(df) > 5000){
-        #         df <- df[sample(1:nrow(df), 5000),]
-        # }
+        #when there are less than 10000 entries take all of them 
+        set.seed(121212)
+        if(nrow(df) > 10000){
+                df <- df[sample(1:nrow(df), 10000),]
+        }
         
         df$cloudType <- as.factor(df$cloudType)
         #rename the cloud types
         df <- dplyr::mutate(df, cloudType = fct_recode(df$cloudType, "water" = "3", "supercooled" = "4", "mixed" = "5", "opaque_ice" = "6", "overlap" = "8", "overshooting" = "9"))
+        
         #transform the first column into a time-date format
         df$acquisitionDate <- as.POSIXct(df$acquisitionDate, format = "%Y-%m-%d %H:%M", tz = "UTC")
         
@@ -59,10 +60,30 @@ rm(df_total)
 #-------------------------------------------------------------------------------
 hist(df$precipitation)
 
+hist(df$precipitation[df$cloudType == "overlap"], xlim = c(0,1.5), main = paste0("Cloud type Overlap\nn = ", as.character(length(df$precipitation[df$cloudType == "overlap"]))))
+#boxplot(df$precipitation[df$cloudType == "overlap"])
+ct_ovl <- df[df$cloudType == "overlap",]
+plot(as.factor(ct_ovl$weather), ct_ovl$precipitation, ylim = c(0,3))
+
+hist(df$precipitation[df$cloudType == "supercooled"], xlim = c(0,1.5), main = paste0("Cloud type Supercooled\nn = ", as.character(length(df$precipitation[df$cloudType == "supercooled"]))))
+ct_sc <- df[df$cloudType == "supercooled",]
+plot(as.factor(ct_sc$weather), ct_sc$precipitation, ylim = c(0,3))
+
+
+hist(df$precipitation[df$cloudType == "overlap"], ylim = c(0,18000), xlim = c(0,1.5), main = paste0("Cloud type Overlap\nn = ", as.character(length(df$precipitation[df$cloudType == "overlap"]))))
+hist(df$precipitation[df$cloudType == "overlap"], ylim = c(0,18000), xlim = c(0,1.5), main = paste0("Cloud type Overlap\nn = ", as.character(length(df$precipitation[df$cloudType == "overlap"]))))
+hist(df$precipitation[df$cloudType == "overlap"], ylim = c(0,18000), xlim = c(0,1.5), main = paste0("Cloud type Overlap\nn = ", as.character(length(df$precipitation[df$cloudType == "overlap"]))))
+
+hist(df$precipitation[df$cloudType == "supercooled"], ylim = c(0,5000))
+hist(df$precipitation[df$cloudType == "water"], ylim = c(0,5000))
+hist(df$precipitation[df$cloudType == "opaque_ice"], ylim = c(0,5000))
+
+
+
 plot(df$cloudType, df$precipitation,
      xlab = "Wolkenklassen",
      ylab = "Niederschlag in mm",
-     main = paste0("Niederschlagswerte in den einzelnen Wolkenklassen\n(n = ", as.character(nrow(df)), ")"),
+     main = paste0("Niederschlagswerte in den einzelnen Wolkenklassen\n(n = ", as.character(nrow(df)), ")\nDez17 komplett - 10.000 Sample pro Tag"),
      outline = F)
 
 #-------------------------------------------------------------------------------
