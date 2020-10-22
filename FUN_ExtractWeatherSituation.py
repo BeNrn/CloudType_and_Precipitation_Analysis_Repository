@@ -11,7 +11,7 @@
 #------------------------------------------------------------------------------
 # 2 LOAD THE DATA
 #------------------------------------------------------------------------------
-# with open(workingDir+"Wetterlagenklassifikation.txt") as weather:
+# with open(workingDir+"PrecipitationValues_DWD/Wetterlagenklassifikation.txt") as weather:
 #     file = weather.readlines()
     
 # file = file[1:13]

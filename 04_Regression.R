@@ -58,33 +58,67 @@ rm(df_total)
 #-------------------------------------------------------------------------------
 #2 PLOT THE DATA
 #-------------------------------------------------------------------------------
+
+#2.1. General data
+#------------------
 hist(df$precipitation)
-
-hist(df$precipitation[df$cloudType == "overlap"], xlim = c(0,1.5), main = paste0("Cloud type Overlap\nn = ", as.character(length(df$precipitation[df$cloudType == "overlap"]))))
-#boxplot(df$precipitation[df$cloudType == "overlap"])
-ct_ovl <- df[df$cloudType == "overlap",]
-plot(as.factor(ct_ovl$weather), ct_ovl$precipitation, ylim = c(0,3))
-
-hist(df$precipitation[df$cloudType == "supercooled"], xlim = c(0,1.5), main = paste0("Cloud type Supercooled\nn = ", as.character(length(df$precipitation[df$cloudType == "supercooled"]))))
-ct_sc <- df[df$cloudType == "supercooled",]
-plot(as.factor(ct_sc$weather), ct_sc$precipitation, ylim = c(0,3))
-
-
-hist(df$precipitation[df$cloudType == "overlap"], ylim = c(0,18000), xlim = c(0,1.5), main = paste0("Cloud type Overlap\nn = ", as.character(length(df$precipitation[df$cloudType == "overlap"]))))
-hist(df$precipitation[df$cloudType == "overlap"], ylim = c(0,18000), xlim = c(0,1.5), main = paste0("Cloud type Overlap\nn = ", as.character(length(df$precipitation[df$cloudType == "overlap"]))))
-hist(df$precipitation[df$cloudType == "overlap"], ylim = c(0,18000), xlim = c(0,1.5), main = paste0("Cloud type Overlap\nn = ", as.character(length(df$precipitation[df$cloudType == "overlap"]))))
-
-hist(df$precipitation[df$cloudType == "supercooled"], ylim = c(0,5000))
-hist(df$precipitation[df$cloudType == "water"], ylim = c(0,5000))
-hist(df$precipitation[df$cloudType == "opaque_ice"], ylim = c(0,5000))
-
-
 
 plot(df$cloudType, df$precipitation,
      xlab = "Wolkenklassen",
      ylab = "Niederschlag in mm",
      main = paste0("Niederschlagswerte in den einzelnen Wolkenklassen\n(n = ", as.character(nrow(df)), ")\nDez17 komplett - 10.000 Sample pro Tag"),
+     log = "y",
      outline = F)
+
+#2.2 Differences in a cloud type depending on the weather situation
+#-------------------------------------------------------------------
+op <- par()
+par(mfrow = c(3,3))
+for(i in seq(1:length(unique(df$weather)))){
+        boxplot(df$precipitation[df$cloudType == "supercooled" & df$weather == unique(df$weather)[i]], ylim = c(0,1.4), main = as.character(unique(df$weather)[i]))
+}
+
+par(op)
+
+#2.3 Differences between the cloud types
+#---------------------------------------
+#boxplot, histogram and bxplot-value extraction for all cloud types
+for(i in seq(1:length(unique(df$cloudType)))){
+        #the cloud type name
+        ct_name <- as.character(unique(df$cloudType)[i])
+        title_name <- paste0("Cloud type ",ct_name, "\nn = ", as.character(length(df$precipitation[df$cloudType == ct_name])))
+        #histogram
+        hist(df$precipitation[df$cloudType == ct_name],
+             xlim = c(0,1.5), 
+             main = title_name)
+        #boxplot
+        boxplot(df$precipitation[df$cloudType == ct_name], 
+                main = title_name,
+                ylim = c(0,3))
+        ct_val <- df[df$cloudType == ct_name,]
+        plot(as.factor(ct_val$weather), 
+             ct_val$precipitation, 
+             ylim = c(0,3), 
+             main = title_name,
+             xlab = "Weather situation",
+             ylab = "Precipitation in mm")
+        #data values
+        print(ct_name)
+        print("----------------")
+        print(unique(df$weather))
+        for(j in seq(1:length(unique(df$weather)))){
+                print(summary(ct_val$precipitation[ct_val$weather == unique(df$weather)[j]])) 
+        }
+}
+
+#single extraction
+hist(df$precipitation[df$cloudType == "overlap"], xlim = c(0,1.5), main = paste0("Cloud type Overlap\nn = ", as.character(length(df$precipitation[df$cloudType == "overlap"]))))
+boxplot(df$precipitation[df$cloudType == "overlap"])
+ct_ovl <- df[df$cloudType == "overlap",]
+plot(as.factor(ct_ovl$weather), ct_ovl$precipitation, ylim = c(0,3), 
+     main = paste0("Cloud type Overlap\nn = ", as.character(length(df$precipitation[df$cloudType == "overlap"]))),
+     xlab = "Weather situation",
+     ylab = "Precipitation in mm")
 
 #-------------------------------------------------------------------------------
 #3 TEST FOR AUTOCORRELATION (MORAN'S I)

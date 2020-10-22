@@ -103,7 +103,7 @@ for days in dayList:
         #onle one time needed
         if timesteps == timeList_day[0]:
             wSit = ws.weatherSituation(workingDir = workingDir, 
-                                       filename = "Wetterlagenklassifikation.txt", 
+                                       filename = "PrecipitationValues_DWD/Wetterlagenklassifikation.txt", 
                                        month = 12)
             wSit = wSit[int(days)-1]
         
