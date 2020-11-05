@@ -105,7 +105,7 @@ for files in rdList:
 
         # Output / destination
         #dst_filename = rd_out+"/Radolan_"+files[8:20]+"_CRS_pixelResample.tif"
-        dst_filename = rd_out+"/Radolan_"+files[8:20]+"_CRS_pixelResample_test.tif"
+        dst_filename = rd_out+"/Radolan_"+files[8:20]+"_CRS_pixelResample.tif"
         dst = gdal.GetDriverByName('GTiff').Create(dst_filename, wide, high, 1, gdalconst.GDT_Float32)
         dst.SetGeoTransform(match_geotrans)
         dst.SetProjection(match_proj)
@@ -160,7 +160,7 @@ for files in ctList:
 
 #for Radolan
 rdList = os.listdir(rd_out)
-fileEnding = "CRS_pixelResample.tif"
+fileEnding = "CRS_pixelResample_test.tif"
 for files in rdList:
     if files.endswith(fileEnding):
         filename = os.path.join(rd_out, files)
