@@ -85,7 +85,7 @@ ape::Moran.I(df_sample$precipitation, distance)
 # [1] 0
 
 #-------------------------------------------------------------------------------
-#4 TEST FOR NORMAL DISTRIBUTION
+#4 VISUAL TEST FOR NORMAL DISTRIBUTION
 #-------------------------------------------------------------------------------
 df_smp <- df[sample(1:nrow(df), 10000),]
 qqnorm(df_smp$precipitation[df_smp$cloudType == "water"])
@@ -97,7 +97,7 @@ qqline(as.numeric(df_smp$cloudType), col = 2)
 #-------------------------------------------------------------------------------
 #5 LINEAR REGRESSION
 #-------------------------------------------------------------------------------
-#eine normale lineare Regression
+#a normal linear regression
 m <- lm(precipitation~cloudType, data = df)
  
 summary(m)
@@ -105,20 +105,21 @@ hist(df$precipitation)
 boxplot(precipitation~cloudType, data = df, outline = T,
         xlab = "Cloud Type", ylab = "Precipitation", main = "Precipitation distribution over the cloud types")
 
-#R-Squared: 0,0008%
+#R-Squared: 0,0019%
 
 
 #TRANSFORM THE DATA TO NORMAL DISTRIBUTION
 #------------------------------------------
 #transformationsparameter lambda
 caret::BoxCoxTrans(df$precipitation)$lambda
-#calculate transformed precip values
+#calculate transformed precipitation values
 df$transformedVal <- df$precipitation^BoxCoxTrans(df$precipitation)$lambda
 #model with transformed /linearized values 
 m_trans <- lm(transformedVal~cloudType, data = df)
 summary(m_trans)
 
-#R-Squared: 0,0006%
+#R-Squared: 0,0025%
+rm(m, m_trans)
 
 #-------------------------------------------------------------------------------
 #6 GAM
@@ -127,10 +128,10 @@ summary(m_trans)
 #y: precipitation
 #linear relationship (von Master, Datenanalyse VL)
 #nimmt aber Normalverteilung an, deshalb schlechtes Ergebnis
-gammod <- gam(precipitation ~ cloudType, data = df, family = gaussian())
-summary(gammod)
+gamMod <- gam(precipitation ~ cloudType, data = df, family = gaussian())
+summary(gamMod)
 #--------------------------
-#explained deviance: 0.081%
+#explained deviance: 0.186%
 #---------------------------
 
 #BIG GAM WITH LAT LON FOR CORRECTION OF AUTOCORRELATION AS REGIONAL SPLINES---
@@ -141,23 +142,30 @@ summary(gamMod)
 
 #subsample to reduce calculating time
 #df <- df[sample(1:nrow(df), 300000),]
+gamMod <- bam(precipitation ~ cloudType + te(lat, lon), data = df, family = gaussian())
+summary(gamMod)
 #gamMod <- bam(precipitation ~ cloudType + te(lat, lon, k = 50), data = df, family = gaussian())
 gamMod <- bam(precipitation ~ cloudType + te(lat, lon, k = 15), data = df, family = gaussian())
 #, family = Gamma()
+summary(gamMod)
+
+gamMod <- bam(precipitation ~ cloudType + te(lat, lon), data = df, family = Gamma())
 summary(gamMod)
 
 gamMod <- bam(precipitation ~ cloudType + te(lat, lon, k = 15), data = df, family = Gamma())
 summary(gamMod)
 
 #--------------------------
-#explained deviance: 0.044% (BAM)
-#explained deviance: 3.47% (BAM WITH LAT,LON)
-#explained deviance: 6.38% (BAM WITH LAT,LON, k = 10)
-#explained deviance: 8.82% (BAM WITH LAT,LON, k = 15)
-#explained deviance: 4.98% (BAM WITH LAT,LON, WITH GAMMA DISTRIBUTION)
-#explained deviance: 8.27% (BAM WITH LAT,LON, WITH GAMMA DISTRIBUTION, k = 10)
-#explained deviance: 11% (BAM WITH LAT,LON, WITH GAMMA DISTRIBUTION, k = 15)
+#explained deviance: 0.19% (BAM)
+#explained deviance: 1.25% (BAM WITH LAT,LON, k = NULL, Gaussian Dist.)
+#explained deviance: 1.79% (BAM WITH LAT,LON, k = 10,   Gaussian Dist.)
+#explained deviance: 2.25% (BAM WITH LAT,LON, k = 15,   Gaussian Dist.)
+#explained deviance: 2.16% (BAM WITH LAT,LON, k = NULL, Gamma Dist.)
+#explained deviance: 3.11% (BAM WITH LAT,LON, k = 10,   Gamma Dist.)
+#explained deviance: 3.94% (BAM WITH LAT,LON, k = 15,   Gamma Dist.)
 #---------------------------
+
+rm(gamMod)
 
 # df <- df[sample(1:nrow(df), 10000),]
 # 
@@ -184,20 +192,6 @@ hist(df$precipitation, prob = T,xaxt = "n", xlim = c(0.03,1), main = "Precipitat
 axis(side = 1, at = seq(0.1, 1, 0.1))
 lines(range, y, type = "l", col = "red", lwd = 2)
 
-
-#test
-df_smp <- df[sample(1:nrow(df), 10000),]
-
-plot(df_smp$precipitation[df_smp$cloudType == "supercooled"])
-
-summary(glm(precipitation~cloudType, data = df_smp, family = Gamma(link = "log")))
-#summary(glm(precipitation~cloudType, data = df, family = Gamma(link = "log")))
-
-#summary(glm(precipitation~cloudType, data = df_smp, family = Gamma))
-#summary(glm(precipitation~cloudType, data = df, family = Gamma))
-
-#https://www.theanalysisfactor.com/r-glm-model-fit/
-
 #-------------------------------------------------------------------------------
 #8 KRUSKAL-WALLIS-TEST
 #-------------------------------------------------------------------------------
@@ -205,7 +199,7 @@ kruskal.test(precipitation ~ cloudType, data = df)
 #-> there are significant differences between the groups as p < 0.005
 
 dunnResult <- FSA::dunnTest(precipitation ~ cloudType, data = df, method = "bh")
-
+dunnResult
 #                 Comparison          Z      P.unadj        P.adj
 # 1     opaque_ice - overlap -1.0568259 2.905910e-01 3.487092e-01 <- not significant
 # 2 opaque_ice - supercooled -3.2768600 1.049684e-03 1.574526e-03 <- significant, although water group is not part of it
@@ -213,6 +207,19 @@ dunnResult <- FSA::dunnTest(precipitation ~ cloudType, data = df, method = "bh")
 # 4       opaque_ice - water  8.6537070 4.985309e-18 1.495593e-17 <- water is quite different from the other groups
 # 5          overlap - water  7.6815953 1.571196e-14 3.142391e-14 <-  -"-
 # 6      supercooled - water 11.3748885 5.577411e-30 3.346447e-29 <-  -"-
+
+
+# Comparison          Z      P.unadj        P.adj
+# 1        opaque_ice - overlap  -5.378871 7.495449e-08 7.495449e-08 ** all significant
+# 2   opaque_ice - overshooting -12.475071 1.021155e-35 2.042310e-35
+# 3      overlap - overshooting -10.660460 1.558250e-26 2.597084e-26
+# 4    opaque_ice - supercooled  17.403752 7.727107e-68 7.727107e-67
+# 5       overlap - supercooled  14.658191 1.194128e-48 2.985319e-48
+# 6  overshooting - supercooled  15.019927 5.436759e-51 2.718380e-50
+# 7          opaque_ice - water   8.294975 1.086081e-16 1.357601e-16
+# 8             overlap - water   9.678135 3.734664e-22 5.335234e-22
+# 9        overshooting - water  14.939448 1.824795e-50 6.082649e-50
+# 10        supercooled - water   5.492090 3.972039e-08 4.413377e-08
 
 summary(df$precipitation[df$cloudType == "overlap"])
 summary(df$precipitation[df$cloudType == "opaque_ice"])
