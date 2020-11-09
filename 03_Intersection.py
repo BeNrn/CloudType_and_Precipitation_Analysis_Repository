@@ -7,7 +7,7 @@ import rasterio
 import pandas as pd
 import os
 
-#works only when the current working folder is "C:\Users\tamta\Documents\Studium\02_Master\17_Masterarbeit\04_Skripte" 
+#works only when the current working folder is "C:\Users\tamta\Documents\Studium\02_Master\17_Masterarbeit\CloudType_and_Precipitation_Analysis_Repository" 
 import FUN_ExtractWeatherSituation as ws
 #import matplotlib.pyplot as plt
 #------------------------------------------------------------------------------
@@ -22,6 +22,21 @@ outdir = "Intersection_CT_RD/"
 ctList = os.listdir(workingDir+ctDir)
 rdList = os.listdir(workingDir+rdDir)
 
+###############################################################################
+#SPECIAL FOR PARTLY DATA INTERSECTION JULY 2017
+#----------------------------------------------
+#remove all ct values from Dezember
+ctList = [element for element in ctList if element[7:9] != "12"]
+#remove the incomplete date 11.07. from the ct data
+ctList = [element for element in ctList if element[9:11] != "11"]
+
+#the same for radolan
+rdList = rdList[1:len(rdList)]
+rdList = [element for element in rdList if element[12:14] != "12"]
+#all dates that are not yet extracted: np.arange(11,32)
+for i in np.arange(11,32):
+    rdList = [element for element in rdList if element[14:16] != str(i)]   
+###############################################################################
 #------------------------------------------------------------------------------
 # 2 DATA INTERSECTION
 #------------------------------------------------------------------------------
@@ -49,6 +64,10 @@ dayList.sort()
 
 #2.2 Loop over all single days
 #-----------------------------
+#Prerequisites:
+#[X] adjust the month of the weather classification
+#[X] define the output name and directory at the end of the loop
+#--------
 #loop over days
 for days in dayList:
     #loop over timelist to extract all records from i'th day
@@ -105,6 +124,7 @@ for days in dayList:
             wSit = ws.weatherSituation(workingDir = workingDir, 
                                        filename = "PrecipitationValues_DWD/Wetterlagenklassifikation.txt", 
                                        month = 12)
+                                       #month = 7)
             wSit = wSit[int(days)-1]
         
         #intersection
@@ -125,6 +145,7 @@ for days in dayList:
 
     #write to disk
     df.to_csv(workingDir+outdir+"CT_RD_intersection_12" + days + ".csv",sep = ",")
+    #df.to_csv(workingDir+outdir+"CT_RD_intersection_07" + days + ".csv",sep = ",")
     
 #------------------------------------------------------------------------------
 # 3 PLOTTING

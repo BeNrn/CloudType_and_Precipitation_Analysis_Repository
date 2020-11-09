@@ -73,17 +73,17 @@ ape::Moran.I(df_sample$precipitation, distance)
 #Nullhypothese kann abgelehnt werden -> räumliche Clusterung
 
 # $observed
-# [1] 0.04935017
+# [1] 0.02580478
 # 
 # $expected
 # [1] -0.00010001
 # 
 # $sd
-# [1] 0.0002808298
+# [1] 0.0002310415
 # 
 # $p.value
 # [1] 0
-
+rm(df_sample, distance)
 #-------------------------------------------------------------------------------
 #4 VISUAL TEST FOR NORMAL DISTRIBUTION
 #-------------------------------------------------------------------------------
@@ -94,6 +94,7 @@ qqline(df_smp$precipitation[df_smp$cloudType == "water"], col = 2)
 qqnorm(as.numeric(df_smp$cloudType))
 qqline(as.numeric(df_smp$cloudType), col = 2)
 
+rm(df_smp)
 #-------------------------------------------------------------------------------
 #5 LINEAR REGRESSION
 #-------------------------------------------------------------------------------
@@ -105,7 +106,7 @@ hist(df$precipitation)
 boxplot(precipitation~cloudType, data = df, outline = T,
         xlab = "Cloud Type", ylab = "Precipitation", main = "Precipitation distribution over the cloud types")
 
-#R-Squared: 0,0019%
+#R-Squared: 4,6% (as the Adjusted R² is based on 1 = 100%)
 
 
 #TRANSFORM THE DATA TO NORMAL DISTRIBUTION
@@ -118,7 +119,7 @@ df$transformedVal <- df$precipitation^BoxCoxTrans(df$precipitation)$lambda
 m_trans <- lm(transformedVal~cloudType, data = df)
 summary(m_trans)
 
-#R-Squared: 0,0025%
+#R-Squared: 3,0%
 rm(m, m_trans)
 
 #-------------------------------------------------------------------------------
@@ -131,7 +132,7 @@ rm(m, m_trans)
 gamMod <- gam(precipitation ~ cloudType, data = df, family = gaussian())
 summary(gamMod)
 #--------------------------
-#explained deviance: 0.186%
+#explained deviance: 4,63%
 #---------------------------
 
 #BIG GAM WITH LAT LON FOR CORRECTION OF AUTOCORRELATION AS REGIONAL SPLINES---
@@ -146,7 +147,6 @@ gamMod <- bam(precipitation ~ cloudType + te(lat, lon), data = df, family = gaus
 summary(gamMod)
 #gamMod <- bam(precipitation ~ cloudType + te(lat, lon, k = 50), data = df, family = gaussian())
 gamMod <- bam(precipitation ~ cloudType + te(lat, lon, k = 15), data = df, family = gaussian())
-#, family = Gamma()
 summary(gamMod)
 
 gamMod <- bam(precipitation ~ cloudType + te(lat, lon), data = df, family = Gamma())
@@ -156,13 +156,13 @@ gamMod <- bam(precipitation ~ cloudType + te(lat, lon, k = 15), data = df, famil
 summary(gamMod)
 
 #--------------------------
-#explained deviance: 0.19% (BAM)
-#explained deviance: 1.25% (BAM WITH LAT,LON, k = NULL, Gaussian Dist.)
-#explained deviance: 1.79% (BAM WITH LAT,LON, k = 10,   Gaussian Dist.)
-#explained deviance: 2.25% (BAM WITH LAT,LON, k = 15,   Gaussian Dist.)
-#explained deviance: 2.16% (BAM WITH LAT,LON, k = NULL, Gamma Dist.)
-#explained deviance: 3.11% (BAM WITH LAT,LON, k = 10,   Gamma Dist.)
-#explained deviance: 3.94% (BAM WITH LAT,LON, k = 15,   Gamma Dist.)
+#explained deviance: 4,63% (BAM)
+#explained deviance: 5,32% (BAM WITH LAT,LON, k = NULL, Gaussian Dist.)
+#explained deviance: 5,75% (BAM WITH LAT,LON, k = 10,   Gaussian Dist.)
+#explained deviance: 6,01% (BAM WITH LAT,LON, k = 15,   Gaussian Dist.)
+#explained deviance: 11,1% (BAM WITH LAT,LON, k = NULL, Gamma Dist.)
+#explained deviance: "11,1%" (BAM WITH LAT,LON, k = 10,   Gamma Dist.) ERROR
+#explained deviance: "11,1%" (BAM WITH LAT,LON, k = 15,   Gamma Dist.) ERROR
 #---------------------------
 
 rm(gamMod)
@@ -192,6 +192,7 @@ hist(df$precipitation, prob = T,xaxt = "n", xlim = c(0.03,1), main = "Precipitat
 axis(side = 1, at = seq(0.1, 1, 0.1))
 lines(range, y, type = "l", col = "red", lwd = 2)
 
+rm(y, x, range, stdDev, alpha, beta)
 #-------------------------------------------------------------------------------
 #8 KRUSKAL-WALLIS-TEST
 #-------------------------------------------------------------------------------
@@ -208,20 +209,33 @@ dunnResult
 # 5          overlap - water  7.6815953 1.571196e-14 3.142391e-14 <-  -"-
 # 6      supercooled - water 11.3748885 5.577411e-30 3.346447e-29 <-  -"-
 
+# "*" ...significant
+# "-" ...not significant
 
-# Comparison          Z      P.unadj        P.adj
-# 1        opaque_ice - overlap  -5.378871 7.495449e-08 7.495449e-08 ** all significant
-# 2   opaque_ice - overshooting -12.475071 1.021155e-35 2.042310e-35
-# 3      overlap - overshooting -10.660460 1.558250e-26 2.597084e-26
-# 4    opaque_ice - supercooled  17.403752 7.727107e-68 7.727107e-67
-# 5       overlap - supercooled  14.658191 1.194128e-48 2.985319e-48
-# 6  overshooting - supercooled  15.019927 5.436759e-51 2.718380e-50
-# 7          opaque_ice - water   8.294975 1.086081e-16 1.357601e-16
-# 8             overlap - water   9.678135 3.734664e-22 5.335234e-22
-# 9        overshooting - water  14.939448 1.824795e-50 6.082649e-50
-# 10        supercooled - water   5.492090 3.972039e-08 4.413377e-08
+#   Comparison                   Z          P.unadj       P.adj (Benjamini-Hochberg adjustmen)
+# 1        opaque_ice - overlap  -8.385532  5.049669e-17  6.312086e-17 *
+# 2   opaque_ice - overshooting -83.608021  0.000000e+00  0.000000e+00 *
+# 3      overlap - overshooting -70.014296  0.000000e+00  0.000000e+00 *
+# 4    opaque_ice - supercooled  47.453424  0.000000e+00  0.000000e+00 *
+# 5       overlap - supercooled  36.619214 1.414674e-293 2.357791e-293 *
+# 6  overshooting - supercooled 102.365663  0.000000e+00  0.000000e+00 *
+# 7          opaque_ice - water  -5.743477  9.275187e-09  1.030576e-08 *
+# 8             overlap - water  -1.992442  4.632259e-02  4.632259e-02 * (almost not)
+# 9        overshooting - water  43.268998  0.000000e+00  0.000000e+00 *
+# 10        supercooled - water -17.528444  8.691519e-69  1.241646e-68 *
 
+print("overlap")
 summary(df$precipitation[df$cloudType == "overlap"])
+print("opaque_ice")
+summary(df$precipitation[df$cloudType == "opaque_ice"])
+print("supercooled")
+summary(df$precipitation[df$cloudType == "supercooled"])
+print("overshooting")
+summary(df$precipitation[df$cloudType == "overshooting"])
+print("water")
+summary(df$precipitation[df$cloudType == "water"])
+
+
 summary(df$precipitation[df$cloudType == "opaque_ice"])
 plot(df$cloudType[df$cloudType == "opaque_ice" | df$cloudType == "overlap"], 
      df$precipitation[df$cloudType == "opaque_ice" | df$cloudType == "overlap"],

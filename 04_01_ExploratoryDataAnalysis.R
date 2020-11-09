@@ -1,11 +1,6 @@
 file_base <- "C:/Users/tamta/Documents/Studium/02_Master/17_Masterarbeit/03_Data/"
 
-#library(forcats)
-#library(caret)
-#library(mgcv)
-#library(ape)
-#library(FSA)
-
+library(forcats)
 #-------------------------------------------------------------------------------
 #1 LOAD THE DATA
 #-------------------------------------------------------------------------------
@@ -66,7 +61,7 @@ hist(df$precipitation)
 plot(df$cloudType, df$precipitation,
      xlab = "Wolkenklassen",
      ylab = "Niederschlag in mm",
-     main = paste0("Niederschlagswerte in den einzelnen Wolkenklassen\n(n = ", as.character(nrow(df)), ")\nDez17 komplett - 10.000 Sample pro Tag"),
+     main = paste0("Niederschlagswerte in den einzelnen Wolkenklassen\n(n = ", as.character(nrow(df)), ")\nDez17+1.-10.Jul. - 10.000 Sample pro Tag"),
      log = "y",
      outline = F)
 
@@ -82,7 +77,7 @@ for(i in seq(1:length(unique(df$cloudType)))){
   hist(df$precipitation[df$cloudType == ct_name],
        xlim = c(0,1), 
        main = title_name,
-       breaks = c(seq(0.1,2.9,0.1)),
+       breaks = c(seq(0.1,10,0.1)),
        labels = T,
        col = "lightblue")
   #boxplot

@@ -34,7 +34,7 @@ def weatherSituation(workingDir, filename, month):
     Its interpretation can be found here:
     https://www.dwd.de/DE/leistungen/wetterlagenklassifikation/kennzahlen_kennungen.html?nn=16102&lsbId=375412
     This function extracts first the year 2017 (research period of Master's thesis).
-    Subsequently, one month is derived, in which the singel daily resolution.
+    Subsequently, one month is derived, containing the weather situation at a daily resolution.
     
     Parameters
     ----------
