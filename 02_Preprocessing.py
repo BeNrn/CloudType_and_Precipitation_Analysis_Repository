@@ -83,12 +83,13 @@ for files in rdList:
 #-------
 for files in msgList:
     if files.endswith(fileEnding):
+        print(files)
         filename = os.path.join(workingDir+msgDir, files)
         with rasterio.open(filename) as src:  
             transform, width, height = calculate_default_transform(src.crs, dst_crs, src.width, src.height, *src.bounds)
             kwargs = src.meta.copy()
             kwargs.update({'crs': dst_crs, 'transform': transform, 'width': width, 'height': height})
-            with rasterio.open(msg_out + files[0:22]+"_CRStransform.tif", "w", **kwargs) as dst:
+            with rasterio.open(msg_out + files[0:23]+"_CRStransform.tif", "w", **kwargs) as dst:
                 for i in range(1, src.count + 1):    
                     reproject(source=rasterio.band(src, i),
                               destination=rasterio.band(dst, i),
@@ -176,7 +177,7 @@ for files in msgList:
 
         # Output / destination
         #dst_filename = rd_out+"/Radolan_"+files[8:20]+"_CRS_pixelResample.tif"
-        dst_filename = msg_out + files[0:22] + "_CRS_pixelResample.tif"
+        dst_filename = msg_out + files[0:23] + "_CRS_pixelResample.tif"
         dst = gdal.GetDriverByName('GTiff').Create(dst_filename, wide, high, 1, gdalconst.GDT_Float32)
         dst.SetGeoTransform(match_geotrans)
         dst.SetProjection(match_proj)
@@ -253,7 +254,7 @@ for files in msgList:
     if files.endswith(fileEnding):
         filename = os.path.join(msg_out, files)
         dataset = gdal.Open(filename)
-        outfile = msg_out + files[0:22] + "_CRS_Resample_bbox.tif"
+        outfile = msg_out + files[0:23] + "_CRS_Resample_bbox.tif"
         #extract regional subset to new geotiff
         gdal.Translate(outfile, dataset, projWin = [minX, maxY, maxX, minY])
         #close dataset

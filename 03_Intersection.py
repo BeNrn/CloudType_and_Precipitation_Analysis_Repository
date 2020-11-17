@@ -16,11 +16,13 @@ import FUN_ExtractWeatherSituation as ws
 workingDir = "C:/Users/tamta/Documents/Studium/02_Master/17_Masterarbeit/03_Data/"
 ctDir = "CloudType_Preprocessing/"
 rdDir = "Radolan_Preprocessing/"
+msgDir = "MSGSpectral_Preprocessing/"
 
 outdir = "Intersection_CT_RD/"
 
-ctList = os.listdir(workingDir+ctDir)
-rdList = os.listdir(workingDir+rdDir)
+ctList = os.listdir(workingDir + ctDir)
+rdList = os.listdir(workingDir + rdDir)
+msgList = os.listdir(workingDir + msgDir)
 
 ###############################################################################
 #SPECIAL FOR PARTLY DATA INTERSECTION JULY 2017
@@ -83,11 +85,11 @@ for days in dayList:
         dateList = dateList + [(dates[0:4] + "-" + dates[4:6] + "-" + dates[6:8] + " " + dates[8:10] + ":" + dates[10:12])]
    
     #create empty dataframe for output storage
-    df = pd.DataFrame(columns = ["acquisitionDate", "lat", "lon", "weather", "cloudType", "precipitation"])
+    df = pd.DataFrame(columns = ["acquisitionDate", "lat", "lon", "weather", "cloudType", "precipitation", "IR_039", "IR_087", "IR_097", "IR_108", "IR_120", "IR_134", "WV_062", "WV_073"])
 
     #actual data extraction
     for timesteps in timeList_day:
-        print(timesteps)
+        #print(timesteps)
         #extract the ct pixel values
         for filesCT in ctList:
             if filesCT.endswith(str(timesteps+"_CRS_"+fileEnding)):
@@ -126,6 +128,30 @@ for days in dayList:
                                        month = 12)
                                        #month = 7)
             wSit = wSit[int(days)-1]
+            
+        #extract the MSG channel data
+        allChannels = ("IR_039", "IR_087", "IR_097", "IR_108", "IR_120", "IR_134", "WV_062", "WV_073")
+        
+        #filter for date
+        for filesMSG in msgList:
+            if filesMSG.endswith("_CRS_Resample_"+fileEnding):
+                #filter for channel
+                                
+                #IDEE: 3D array erstellen, welcher nach und nach gefüllt wird
+                #2d Array konnte bereits erstellt werden (siehe a)
+                #hier dann weiter
+                a = [[0]*173]*233
+                a = np.array(a)
+                
+             
+                for channels in allChannels:
+                    if filesMSG[17:23] == channels:
+                        msg = rasterio.open(filenameMSG)
+                        msg_channelData = msg.read(1)
+                        msg.close()
+                    
+                
+        
         
         #intersection
         isec = np.array([ctData,rdData])
