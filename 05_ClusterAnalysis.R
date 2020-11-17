@@ -186,7 +186,7 @@ plotsilho(es)
 plotsilho(sil_params)
 
 #Silhouetten Werte in Abhängigkeit von der Klassenzahl
-#Klassenzahl mit dem höxhsten Wert entspricht der richtigen Klassenzahl
+#Klassenzahl mit dem höchsten Wert entspricht der richtigen Klassenzahl
 #Klassenzahl steigt auf wie folgt:
 #1. 2Klassen
 #2. 3Klassen ...
