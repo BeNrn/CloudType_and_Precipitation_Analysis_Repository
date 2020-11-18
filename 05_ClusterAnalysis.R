@@ -4,6 +4,7 @@ dataDir <- paste0(workingDir, "/03_Data/")
 library(forcats)
 library(ecodist)
 library(magrittr)
+library(tidyverse)
 
 #-------------------------------------------------------------------------------
 #1 LOAD THE DATA
@@ -55,85 +56,115 @@ for(files in fileList){
 df <- df_total
 rm(df_total)
 
+#draw a sample
 set.seed(100)
 smp <- sample(df$precipitation, 100)
+
+smp_totalDF <- df[sample(1:nrow(df), 100),]
 
 #-------------------------------------------------------------------------------
 #2 CLUSTER ANALYSIS - HIERARCHICAL CLUSTERING
 #-------------------------------------------------------------------------------
-#2.1 load the data
+#gamma coefficient function
+source(paste0(workingDir, "CloudType_and_Precipitation_Analysis_Repository/FUN_Gammacoefficient.R"))
+
+#2.1 Example
+#-----------
+#2.1.1 load the data
 alter <- c(43, 38, 6, 47, 37, 9)
-
-smp
-
-#2.2 calculate the discance matrix
+#2.1.2 calculate the discance matrix
 d <- dist(alter)
-
-distMat <- dist(smp)
-
-#2.3 hierarchical clustering
+#2.1.3 hierarchical clustering
 #method: distinguishes among others single-linkage, complete-linkage and average-linkage
 e <- hclust(d, method = "complete", members = NULL)
-
-cluster <- hclust(distMat, method = "complete", members = NULL)
-
-
-#2.4 Quality of the clustering
+#2.1.4 Quality of the clustering
 #cophenetic distance matrix
 coph <- cophenetic(e)
 coph <- full(coph)
-
-cophMat <- cophenetic(cluster)
-cophMat <- full(cophMat)
-
 #full distance matrix
 dm <- ecodist::full(d)
-distMat <- ecodist::full(distMat)
-
 #correlation
 cor(dm[lower.tri(dm)], coph[lower.tri(coph)])
-
-cor(distMat[lower.tri(distMat)], cophMat[lower.tri(cophMat)])
-
-
 #gamma coefficient
-gammakoeffizient <- function(v1, v2){
-  m1 <- outer(v1, v1, FUN = "<")
-  m1 <- m1[lower.tri(m1)]
-  m2 <- outer(v2, v2, FUN = "<")
-  m2 <- m2[lower.tri(m2)]
-  m3 <- outer(v1, v1, FUN = ">")
-  m3 <- m3[lower.tri(m3)]
-  m4 <- outer(v2, v2, FUN = ">")
-  m4 <- m4[lower.tri(m4)]
-  C <- sum((m1 + m2) == 2)
-  C <- C + sum((m3 + m4) == 2)
-  D <- sum((m1 + m4) == 2)
-  D <- D + sum((m2 + m3) == 2)
-  (C - D)/(C + D)
-}
-
 gammakoeffizient(dm[lower.tri(dm)], coph[lower.tri(coph)])
-gammakoeffizient(distMat[lower.tri(distMat)], cophMat[lower.tri(cophMat)])
-
 #Morjans Test
 1+sum((e$height-mean(e$height))/sqrt(e$height)>1.25)
-1+sum((cluster$height-mean(cluster$height))/sqrt(cluster$height)>1.25)
-
-
 #Treppen plot
-ch <- cluster$height
-
-plot(rep(1,2),c(0,ch[1]),xaxt="n",yaxt="n",xlim=c(0,length(smp)),
-     xaxs="i",yaxs="i",ylim=c(0,1),type="l",
+ch <- e$height
+dat <- alter
+resolution <- 1
+plot(rep(1,2),c(0,ch[1]),xaxt="n",yaxt="n",xlim=c(0,length(dat)),
+     xaxs="i",yaxs="i",ylim=c(0,max(dat)),type="l",
      xlab="Anzahl Gruppen",ylab="Verschmelzungsniveau")
 for(i in 2:length(ch)) lines(c(i,i),c(ch[i-1],ch[i]))
 for (i in seq(1:(length(ch)-1))) lines(c(i,i+1),rep(ch[i],2))
 #add axis labels
 #xaxis
-axis(1, at = 0:100,labels=100:0)
+axis(1, at = 0:length(dat),labels=length(dat):0)
 #yaxis
-axis(2, at = seq(0,1,0.1), labels = seq(0,1,0.1))
+axis(2, at = seq(0,max(dat),resolution), labels = seq(0,max(dat),resolution))
+
+#2.2 Anwendung, nur mit Regendaten
+#---------------------------------
+#2.2.1 load the data
+smp
+#2.2.2 calculate the discance matrix
+distMat <- dist(smp)
+#2.2.3 hierarchical clustering
+cluster <- hclust(distMat, method = "complete", members = NULL)
+plot(cluster)
+#2.2.4 Quality of the clustering
+#cophenetic distance matrix
+cophMat <- cophenetic(cluster)
+cophMat <- full(cophMat)
+#full distance matrix
+distMat <- ecodist::full(distMat)
+#correlation
+cor(distMat[lower.tri(distMat)], cophMat[lower.tri(cophMat)])
+#gamma coefficient
+gammakoeffizient(distMat[lower.tri(distMat)], cophMat[lower.tri(cophMat)])
+#Morjans Test
+1+sum((cluster$height-mean(cluster$height))/sqrt(cluster$height)>1.25)
+#Treppen plot
+ch <- cluster$height
+dat <- smp
+resolution <- 0.1
+plot(rep(1,2),c(0,ch[1]),xaxt="n",yaxt="n",xlim=c(0,length(dat)),
+     xaxs="i",yaxs="i",ylim=c(0,max(dat)),type="l",
+     xlab="Anzahl Gruppen",ylab="Verschmelzungsniveau")
+for(i in 2:length(ch)) lines(c(i,i),c(ch[i-1],ch[i]))
+for (i in seq(1:(length(ch)-1))) lines(c(i,i+1),rep(ch[i],2))
+#add axis labels
+#xaxis
+axis(1, at = 0:length(dat),labels=length(dat):0)
+#yaxis
+axis(2, at = seq(0,max(dat),resolution), labels = seq(0,max(dat),resolution))
+
+#2.3 Anwendung kompletter df
+#---------------------------------
+#see also https://uc-r.github.io/hc_clustering
+#2.2.1 load the data
+smp_totalDF
+#2.2.2 calculate the discance matrix
+distMat <- dist(smp_totalDF)
+#2.2.3 hierarchical clustering
+cluster <- hclust(distMat, method = "complete", members = NULL)
+################################################################################
+#TEST
+#plot
+plot(cluster)
+
+#divide the data in k groups by its height in the dendrogram
+sub_grp <- cutree(cluster, k = 5)
+table(sub_grp)
+#add a column with group 
+smp_totalDF %>% mutate(cluster = sub_grp) %>% head
+#plot rectangulars
+plot(cluster)
+rect.hclust(cluster, k = 5, border = 2:6)
+
+
+################################################################################
 
 #-------------------------------------------------------------------------------
 #3 CLUSTER ANALYSIS - PARTITIONING  CLUSTERING
@@ -171,7 +202,8 @@ plotsilho <- function(silinfo){
   #reversed s(i) values
   S <- rev(silinfo[[1]][, 3])
   #space between groups
-  space <- c(0, rev(diff(silinfo[[1]][, 1])))
+  space <- c(0, rev(diff(silinfo[[1]][,1])))
+  space[space == -1] <- 1
   #names
   names <- rev(dimnames(silinfo[[1]])[[1]])
   if(!is.character(names))
@@ -197,7 +229,7 @@ si <- rep(0,length(alter)-2)
 #iteration über oben genannte Klassenzahlen
 for(i in 2:(length(alter)-1)){
   e_g <- kmeans(x = matrix(alter,length(alter),1),
-         center = matrix(alter[1:i],i,1)) %>% print()
+         center = matrix(alter[1:i],i,1))
   si[i-1]<-silhouette_params(cluster = e_g, distMat = dm, dat = alter)[[3]]
 }
 si

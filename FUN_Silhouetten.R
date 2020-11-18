@@ -16,6 +16,7 @@ silhouette_params <- function(cluster, distMat, dat){
   
   #introduce the df
   df <- data.frame(elementNumber = NULL, index = NULL, groupNum = NULL)
+  #fill in the data (element number, index and group number)
   for(i in 1:groupNumber){
    #data values for class i
    groupElements <- dat[cluster$cluster == i]
@@ -77,6 +78,8 @@ silhouette_params <- function(cluster, distMat, dat){
     df$nearestGroup[i] <- nearestGroup
     df$b[i] <- min(distToAllOtherGroups$meanDist)
   }
+  #set NaN values for a equal b, as s_i turns to 0 in this case
+  df[is.nan(df$a),4] <- df[is.nan(df$a),6] 
   
   #4. calculate s(i)
   #-----------------
@@ -100,15 +103,20 @@ silhouette_params <- function(cluster, distMat, dat){
   
   #7. data output
   #---------------
-  #sort the data first by group (for loop), than by s_i value (order argument)
-  df_total <- subset(df, subset = FALSE)
-  for(i in 1:length(unique(df$groupNum))){
-    df_temp <- df[df$groupNum == i,]
-    df_temp <- df_temp[order(df_temp$s_i, decreasing = TRUE),]
-    df_total <- rbind(df_total, df_temp)
-  }
-  df <- df_total
-  rm(df_total)
+  #sort the data  by group and  by s_i value
+  df <- df[order(df$s_i, decreasing = TRUE),]
+  
+  #copy of df
+  # df_total <- subset(df, subset = FALSE)
+  # for(i in 1:length(unique(df$groupNum))){
+  #   df_temp <- df[df$groupNum == i,]
+  #   df_temp <- df_temp[order(df_temp$s_i, decreasing = TRUE),]
+  #   df_total <- rbind(df_total, df_temp)
+  # }
+  # df_total
+  # df <- df_total
+  # rm(df_total)
+  
   
   dat <- matrix(0, nrow(df), 3)
   dat[,1] <- df$groupNum
