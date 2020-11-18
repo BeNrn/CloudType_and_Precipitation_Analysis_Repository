@@ -6,6 +6,7 @@ import numpy as np
 import rasterio
 import pandas as pd
 import os
+from glob import glob
 
 #works only when the current working folder is "C:\Users\tamta\Documents\Studium\02_Master\17_Masterarbeit\CloudType_and_Precipitation_Analysis_Repository" 
 import FUN_ExtractWeatherSituation as ws
@@ -84,9 +85,6 @@ for days in dayList:
     for dates in timeList_day:
         dateList = dateList + [(dates[0:4] + "-" + dates[4:6] + "-" + dates[6:8] + " " + dates[8:10] + ":" + dates[10:12])]
    
-    #create empty dataframe for output storage
-    df = pd.DataFrame(columns = ["acquisitionDate", "lat", "lon", "weather", "cloudType", "precipitation", "IR_039", "IR_087", "IR_097", "IR_108", "IR_120", "IR_134", "WV_062", "WV_073"])
-
     #actual data extraction
     for timesteps in timeList_day:
         #print(timesteps)
@@ -130,48 +128,54 @@ for days in dayList:
             wSit = wSit[int(days)-1]
             
         #extract the MSG channel data
-        allChannels = ("IR_039", "IR_087", "IR_097", "IR_108", "IR_120", "IR_134", "WV_062", "WV_073")
-        
+      
         #filter for date
+        #define an extra list for each timestep
+        MSG_timestep_list = []
         for filesMSG in msgList:
-            if filesMSG.endswith("_CRS_Resample_"+fileEnding):
-                #filter for channel
-                                
-                #IDEE: 3D array erstellen, welcher nach und nach gefüllt wird
-                #2d Array konnte bereits erstellt werden (siehe a)
-                #hier dann weiter
-                a = [[0]*173]*233
-                a = np.array(a)
-                
-             
-                for channels in allChannels:
-                    if filesMSG[17:23] == channels:
-                        msg = rasterio.open(filenameMSG)
-                        msg_channelData = msg.read(1)
-                        msg.close()
-                    
-                
+            #slightly adapted filtering caused by MSG channel information in between
+            if filesMSG.endswith("CRS_Resample_"+fileEnding) and filesMSG.startswith("MSG_"+timesteps):
+                MSG_timestep_list = MSG_timestep_list + [filesMSG]
         
+        #create a numpy array construction that can be filled
+        msg_channelData = [[[0]*173]*233]*8
+        msg_channelData = np.array(msg_channelData)
+        allChannels = ["IR_039", "IR_087", "IR_097", "IR_108", "IR_120", "IR_134", "WV_062", "WV_073"]
         
-        #intersection
-        isec = np.array([ctData,rdData])
-        
+        #iterate over created list
+        for elements in MSG_timestep_list:
+            #filter for channel
+            for channels in allChannels:
+                if elements[17:23] == channels:
+                    filenameMSG = os.path.join(workingDir+msgDir, elements)
+                    msg = rasterio.open(filenameMSG)
+                    msg_channelData[list.index(allChannels, channels)] = msg.read(1)
+                    msg.close()
+                     
         #--------------------------------------------------------------------------
         # 3 DATA COLLECTION AND WRITING TO DISK
         #--------------------------------------------------------------------------
         #store ct and rad in df
+        #create empty dataframe for output storage
+        df = pd.DataFrame(columns = ["acquisitionDate", "lat", "lon", "weather", "cloudType", "precipitation", "IR_039", "IR_087", "IR_097", "IR_108", "IR_120", "IR_134", "WV_062", "WV_073"])
+
         #acquisition date: to get the correct date for each scene (array with 233x173 pixel), 
         #  the date is converted from "201712010015" to "2017-12-01 00:15"
-        data = {"acquisitionDate":dateList[timeList_day.index(timesteps)], "lat":np.array(latDF, dtype = np.float).flatten(),
+        data = {"acquisitionDate":dateList[timeList_day.index(timesteps)], 
+                "lat":np.array(latDF, dtype = np.float).flatten(),
                 "lon":np.array(lonDF, dtype = np.float).flatten(), "weather": wSit,
-                "cloudType": ctData.flatten(), "precipitation": rdData.flatten()}
+                "cloudType": ctData.flatten(), "precipitation": rdData.flatten(), 
+                "IR_039": msg_channelData[0].flatten(), "IR_087": msg_channelData[1].flatten(), 
+                "IR_097": msg_channelData[2].flatten(), "IR_108": msg_channelData[3].flatten(),
+                "IR_120": msg_channelData[4].flatten(), "IR_134": msg_channelData[5].flatten(),
+                "WV_062": msg_channelData[6].flatten(), "WV_073": msg_channelData[7].flatten()}
         df_temp = pd.DataFrame(data = data, index = np.arange(0,233*173))
         frame = [df, df_temp]
         df = pd.concat(frame)
 
     #write to disk
-    df.to_csv(workingDir+outdir+"CT_RD_intersection_12" + days + ".csv",sep = ",")
-    #df.to_csv(workingDir+outdir+"CT_RD_intersection_07" + days + ".csv",sep = ",")
+    #df.to_csv(workingDir+outdir+"CT_RD_intersection_12" + days + ".csv",sep = ",")
+    df.to_csv(workingDir+outdir+"CT_RD_intersection_07" + days + "_TEST.csv",sep = ",")
     
 #------------------------------------------------------------------------------
 # 3 PLOTTING
