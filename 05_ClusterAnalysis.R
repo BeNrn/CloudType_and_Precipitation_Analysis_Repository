@@ -9,7 +9,7 @@ library(magrittr)
 #1 LOAD THE DATA
 #-------------------------------------------------------------------------------
 fileList <- list.files(paste0(dataDir, "Intersection_CT_RD/"))
-fileList <- fileList[1]
+fileList <- fileList[2]
 
 for(files in fileList){
   print(files)
@@ -147,7 +147,8 @@ alter <- c(43,38,6,47,37,9)
 #k-means function
 #x........matrix of the data
 #center...the center and the number of the classes, must be predefined 
-e <- kmeans(matrix(alter,6,1),matrix(c(29,31),2,1))
+#kmeans(x = matrix(alter,6,1), centers = 2)
+e <- kmeans(x = matrix(alter,6,1), center = matrix(alter[1:2],2,1))
 dm <- full(dist(alter))
 
 #Mittelwerte der Klassen
@@ -182,7 +183,6 @@ plotsilho <- function(silinfo){
   invisible()
 }
 
-plotsilho(es)
 plotsilho(sil_params)
 
 #Silhouetten Werte in Abhängigkeit von der Klassenzahl
@@ -190,12 +190,15 @@ plotsilho(sil_params)
 #Klassenzahl steigt auf wie folgt:
 #1. 2Klassen
 #2. 3Klassen ...
+#si Werte, benötigte Anzahl gleich Variablenlänge -2 (da alle in einer Klasse und 
+# ein Werte in jeweils einer Klasse nicht untersucht werden)
 si <- rep(0,length(alter)-2)
-dm <- full(dist(alter))
+
+#iteration über oben genannte Klassenzahlen
 for(i in 2:(length(alter)-1)){
-  wo <- kmeans(matrix(alter,6,1),
-               matrix(alter[1:i],i,1))$cluster
-  si[i-1]<-silho(wo,dm,1:6)[[3]]
+  e_g <- kmeans(x = matrix(alter,length(alter),1),
+         center = matrix(alter[1:i],i,1)) %>% print()
+  si[i-1]<-silhouette_params(cluster = e_g, distMat = dm, dat = alter)[[3]]
 }
 si
 
