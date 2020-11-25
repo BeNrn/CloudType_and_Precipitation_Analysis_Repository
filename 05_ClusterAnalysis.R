@@ -75,7 +75,7 @@ smp_totalDF <- df[sample(1:nrow(df), 100),]
 #gamma coefficient function
 source(paste0(workingDir, "CloudType_and_Precipitation_Analysis_Repository/FUN_Gammacoefficient.R"))
 
-#2.1 load the data
+#2.1 prepare the data
 #remove all variables that only have one characteristic 
 smp_totalDF$acquisitionDate <- NULL
 smp_totalDF$weather <- NULL
@@ -137,79 +137,7 @@ fviz_gap_stat(gap_stat)
 # - https://uc-r.github.io/kmeans_clustering
 # - Handl, A., & Kuhlenkasper, T. (2017). Multivariate Analysemethoden. https://doi.org/10.1007/978-3-662-54754-0 (Kapitel 13 - Clusteranalyse)
 
-#Silhouette calculation function
-source(paste0(workingDir, "CloudType_and_Precipitation_Analysis_Repository/FUN_Silhouetten.R"))
-
-#3.2 Application solely with precipitation data
-#----------------------------------------------
-#no reasonable reasults, as the inter-group distance is larger than the in-between
-#group discance (many elements at 0.1, few at 0.2 and 0.3, almost non with larger values)
-#load data
-smp
-
-#k-means function
-#x........matrix of the data
-#center...the center and the number of the classes, must be predefined 
-#kmeans(x = matrix(alter,6,1), centers = 2)
-cluster <- kmeans(x = matrix(smp,length(smp),1), center = matrix(c(0.1, 0.3, 0.9),3,1))
-dm <- full(dist(smp))
-
-#Mittelwerte der Klassen
-cluster$centers
-
-#welches Element in welcher Klasse
-cluster$cluster
-
-#innerhalb der Gruppen-Streuung
-cluster$withinss
-
-#größe der Klassen
-cluster$size
-
-#Berechnen der Silhouetten Werte mit der abgewandelten Silhouetten-Funktion
-sil_params<- silhouette_params(cluster = cluster, distMat = dm, dat = smp)
-
-#zeichnen der Silhouetten
-plotsilho <- function(silinfo){
-  #reversed s(i) values
-  S <- rev(silinfo[[1]][, 3])
-  #space between groups
-  space <- c(0, rev(diff(silinfo[[1]][,1])))
-  space[space == -1] <- 1
-  #names
-  names <- rev(dimnames(silinfo[[1]])[[1]])
-  if(!is.character(names))
-    names <- as.character(names)
-  barplot(S, space = space, names = names,
-          xlab = "Breite der Silhouette", ylab = "",
-          xlim = c(min(0, min(S)), 1), horiz = T,
-          mgp = c(2.5, 1, 0))
-  invisible()
-}
-
-plotsilho(sil_params)
-
-#Silhouetten Werte in Abhängigkeit von der Klassenzahl
-#Klassenzahl mit dem höchsten Wert entspricht der richtigen Klassenzahl
-#Klassenzahl steigt auf wie folgt:
-#1. 2Klassen
-#2. 3Klassen ...
-#si Werte, benötigte Anzahl gleich Variablenlänge -2 (da alle in einer Klasse und 
-# ein Werte in jeweils einer Klasse nicht untersucht werden)
-si <- rep(0,length(alter)-2)
-
-#iteration über oben genannte Klassenzahlen
-for(i in 2:(length(alter)-1)){
-  e_g <- kmeans(x = matrix(alter,length(alter),1),
-                center = matrix(alter[1:i],i,1))
-  si[i-1]<-silhouette_params(cluster = e_g, distMat = dm, dat = alter)[[3]]
-}
-si
-
-#3.3 Application with complete data
-#-----------------------------------
-#see: https://uc-r.github.io/kmeans_clustering
-#load data
+#3.1 prepare  the data
 head(smp_totalDF)
 smp_totalDF$lat <- NULL
 smp_totalDF$lon <- NULL
@@ -217,16 +145,20 @@ smp_totalDF$cloudType <- NULL
 smp_totalDF$acquisitionDate <- NULL
 smp_totalDF$weather <- NULL
 
+#3.2 distance matrix and general function call
+#distance matrix
 dm <- dist(smp_totalDF)
+#cluster analysis
+cluster <- kmeans(smp_totalDF, center = 4)
+
+#3.3 visualize the similarity of the data
+#as more different the data values as higher the value
 fviz_dist(dm, gradient = list(low = "#00AFBB", mid = "white", high = "#FC4E07"))
 
-#k-means function
-#x........matrix of the data
-#center...the center and the number of the classes, must be predefined 
-#kmeans(x = matrix(alter,6,1), centers = 2)
+#3.4 compare cluster results for different class numbers
 cluster_2 <- kmeans(x = smp_totalDF, centers = 2)
 cluster_3 <- kmeans(x = smp_totalDF, centers = 3)
-cluster_4 <- kmeans(x = smp_totalDF, centers = 4)
+cluster_4 <- kmeans(x = smp_totalDF, centers = 4, nstart = 25)
 cluster_5 <- kmeans(x = smp_totalDF, centers = 5)
 cluster_6 <- kmeans(x = smp_totalDF, centers = 6)
 
@@ -238,73 +170,36 @@ p6 <- fviz_cluster(cluster_6, geom = "point", data = smp_totalDF) + ggtitle("k =
 
 grid.arrange(p2, p3, p4, p5, p6, nrow = 2, top = "Partitionierendes Clusterverfahren (kmeans), sample = 100\nUnterschiedliche Klassenzahl dargestellt auf 1. und 2. Hauptkomponente")
 
-fviz_cluster(cluster, data = smp_totalDF)
-
-
-#Mittelwerte der Klassen
+#3.5 stats
+#mean of the classes
 cluster$centers
-
-#welches Element in welcher Klasse
+#which element in which calss
 cluster$cluster
-
-#innerhalb der Gruppen-Streuung
+#within-group scattering
 cluster$withinss
-
-#größe der Klassen
+#size of the classes
 cluster$size
 
+#3.6 test for the optimal class number statistically
 set.seed(123)
-
-
+#3.6.1 ellbow method
 fviz_nbclust(smp_totalDF, kmeans, method = "wss")
-
+#3.6.2 silhouette method
 fviz_nbclust(smp_totalDF, kmeans, method = "silhouette")
-
-
-# compute gap statistic
-set.seed(123)
+#3.6.3 gap method
 gap_stat <- clusGap(smp_totalDF, FUN = kmeans, nstart = 25,
                     K.max = 10, B = 50)
-# Print the result
 print(gap_stat, method = "firstmax")
 fviz_gap_stat(gap_stat)
 
-#Berechnen der Silhouetten Werte mit der abgewandelten Silhouetten-Funktion
-sil_params<- silhouette_params(cluster = cluster, distMat = dm, dat = smp_totalDF)
+#3.7 save findings in df
+#3.7.1 identify the optimal group number using the methods in 3.6 
+#and the visual appreaence in 3.4
+#3.7.2 perform (if not already done) the cluster analysis
+cluster <- kmeans(smp_totalDF, center = 4, nstart = 25)
+#3.7.3 save the group number in the data
+#printout of structure
+smp_totalDF %>% mutate(ClusterGroup = cluster$cluster) %>% group_by(ClusterGroup) %>% summarise_all("mean")
+df_out <- df %>% mutate(ClusterGroup = cluster$cluster)
 
-#zeichnen der Silhouetten
-plotsilho <- function(silinfo){
-  #reversed s(i) values
-  S <- rev(silinfo[[1]][, 3])
-  #space between groups
-  space <- c(0, rev(diff(silinfo[[1]][,1])))
-  space[space == -1] <- 1
-  #names
-  names <- rev(dimnames(silinfo[[1]])[[1]])
-  if(!is.character(names))
-    names <- as.character(names)
-  barplot(S, space = space, names = names,
-          xlab = "Breite der Silhouette", ylab = "",
-          xlim = c(min(0, min(S)), 1), horiz = T,
-          mgp = c(2.5, 1, 0))
-  invisible()
-}
-
-plotsilho(sil_params)
-
-#Silhouetten Werte in Abhängigkeit von der Klassenzahl
-#Klassenzahl mit dem höchsten Wert entspricht der richtigen Klassenzahl
-#Klassenzahl steigt auf wie folgt:
-#1. 2Klassen
-#2. 3Klassen ...
-#si Werte, benötigte Anzahl gleich Variablenlänge -2 (da alle in einer Klasse und 
-# ein Werte in jeweils einer Klasse nicht untersucht werden)
-si <- rep(0,length(alter)-2)
-
-#iteration über oben genannte Klassenzahlen
-for(i in 2:(length(alter)-1)){
-  e_g <- kmeans(x = matrix(alter,length(alter),1),
-                center = matrix(alter[1:i],i,1))
-  si[i-1]<-silhouette_params(cluster = e_g, distMat = dm, dat = alter)[[3]]
-}
-si
+write.csv(df_out, paste0(dataDir, "ClusterAnalysis/01_07_2017_13Uhr_kmeans.csv"), row.names = F)
