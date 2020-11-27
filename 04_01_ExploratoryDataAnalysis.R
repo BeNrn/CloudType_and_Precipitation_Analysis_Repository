@@ -1,15 +1,18 @@
-file_base <- "C:/Users/tamta/Documents/Studium/02_Master/17_Masterarbeit/03_Data/"
+#explorative data analysis, plots of the data
+
+workingDir <- "C:/Users/tamta/Documents/Studium/02_Master/17_Masterarbeit/03_Data/"
 
 library(forcats)
+
 #-------------------------------------------------------------------------------
 #1 LOAD THE DATA
 #-------------------------------------------------------------------------------
-fileList <- list.files(paste0(file_base, "Intersection_CT_RD/"))
+fileList <- list.files(paste0(workingDir, "Intersection_CT_RD/"))
 #fileList <- fileList[1]
 
 for(files in fileList){
   print(files)
-  df <- read.csv(paste0(file_base, "Intersection_CT_RD/", files))[,-1]
+  df <- read.csv(paste0(workingDir, "Intersection_CT_RD/", files))[,-1]
   #round data to radolan accuracy of 1/10mm
   df$precipitation <- round(df$precipitation, digits = 1)
   #remove zeros (zero precipitation is set to NA by python)
