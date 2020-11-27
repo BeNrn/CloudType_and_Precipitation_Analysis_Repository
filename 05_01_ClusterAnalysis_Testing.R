@@ -111,9 +111,9 @@ for(files in fileList){
   #draw a sample of the valid data values
   #when there are less than 10000 entries take all of them 
   set.seed(121212)
-  if(nrow(df) > 10000){
-    df <- df[sample(1:nrow(df), 10000),]
-  }
+  #if(nrow(df) > 10000){
+  #  df <- df[sample(1:nrow(df), 10000),]
+  #}
   
   df$cloudType <- as.factor(df$cloudType)
   #rename the cloud types
@@ -335,12 +335,14 @@ fviz_gap_stat(gap_stat)
 #1 or 6
 
 ##final cluster analysis
-cluster <- kmeans(smp_totalDF, center = 3, nstart = 25)
+cluster <- kmeans(smp_totalDF, center = 4, nstart = 25)
+#cluster <- kmeans(smp_totalDF, center = 3, nstart = 25)
 #save to disk
 smp_totalDF %>% mutate(ClusterGroup = cluster$cluster) %>% group_by(ClusterGroup) %>% summarise_all("mean")
 df_out <- df_allArea %>% mutate(ClusterGroup = cluster$cluster)
 
-write.csv(df_out, paste0(dataDir, "ClusterAnalysis/01_07_2017_13Uhr_kmeans_scenario2.csv"), row.names = F)
+write.csv(df_out, paste0(dataDir, "ClusterAnalysis/01_07_2017_13Uhr_kmeans_scenario2_4klassen.csv"), row.names = F)
+write.csv(df_out, paste0(dataDir, "ClusterAnalysis/01_07_2017_13Uhr_kmeans_scenario2"), row.names = F)
 
 #-------------------------------------------------------------------------------
 #4 CLUSTER ANALYSIS - PARTITIONING  CLUSTERING  //Scenario 3//
@@ -443,9 +445,11 @@ fviz_gap_stat(gap_stat)
 #1 or 6
 
 ##final cluster analysis
-cluster <- kmeans(smp_totalDF, center = 3, nstart = 25)
+cluster <- kmeans(smp_totalDF, center = 4, nstart = 25)
+#cluster <- kmeans(smp_totalDF, center = 3, nstart = 25)
 #save to disk
 smp_totalDF %>% mutate(ClusterGroup = cluster$cluster) %>% group_by(ClusterGroup) %>% summarise_all("mean")
 df_out <- df_allArea %>% mutate(ClusterGroup = cluster$cluster)
 
-write.csv(df_out, paste0(dataDir, "ClusterAnalysis/01_07_2017_13Uhr_kmeans_scenario4.csv"), row.names = F)
+write.csv(df_out, paste0(dataDir, "ClusterAnalysis/01_07_2017_13Uhr_kmeans_scenario4_4klassen.csv"), row.names = F)
+#write.csv(df_out, paste0(dataDir, "ClusterAnalysis/01_07_2017_13Uhr_kmeans_scenario4.csv"), row.names = F)
