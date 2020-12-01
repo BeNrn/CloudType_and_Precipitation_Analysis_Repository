@@ -11,6 +11,7 @@ from osgeo import ogr, gdal, gdalconst
 # 1 SET FOLDER PATH
 #------------------------------------------------------------------------------
 workingDir = "C:/Users/tamta/Documents/Studium/02_Master/17_Masterarbeit/03_Data/"
+
 ctDir = "CloudType_Raster/"
 rdDir = "Radolan_Raster/"
 msgDir = "MSGSpectral_Raster/"
@@ -18,7 +19,7 @@ msgDir = "MSGSpectral_Raster/"
 ct_out = workingDir + "CloudType_Preprocessing/"
 rd_out = workingDir + "Radolan_Preprocessing/"
 msg_out = workingDir + "MSGSpectral_Preprocessing/"
- 
+
 ctList = os.listdir(workingDir + ctDir)
 rdList = os.listdir(workingDir + rdDir)
 msgList = os.listdir(workingDir + msgDir)
@@ -83,13 +84,12 @@ for files in rdList:
 #-------
 for files in msgList:
     if files.endswith(fileEnding):
-        print(files)
         filename = os.path.join(workingDir+msgDir, files)
         with rasterio.open(filename) as src:  
             transform, width, height = calculate_default_transform(src.crs, dst_crs, src.width, src.height, *src.bounds)
             kwargs = src.meta.copy()
             kwargs.update({'crs': dst_crs, 'transform': transform, 'width': width, 'height': height})
-            with rasterio.open(msg_out + files[0:23]+"_CRStransform.tif", "w", **kwargs) as dst:
+            with rasterio.open(msg_out + files[0:22]+"_CRStransform.tif", "w", **kwargs) as dst:
                 for i in range(1, src.count + 1):    
                     reproject(source=rasterio.band(src, i),
                               destination=rasterio.band(dst, i),
@@ -176,8 +176,7 @@ for files in msgList:
         high = match.RasterYSize
 
         # Output / destination
-        #dst_filename = rd_out+"/Radolan_"+files[8:20]+"_CRS_pixelResample.tif"
-        dst_filename = msg_out + files[0:23] + "_CRS_pixelResample.tif"
+        dst_filename = msg_out + files[0:22] + "_CRS_pixelResample.tif"
         dst = gdal.GetDriverByName('GTiff').Create(dst_filename, wide, high, 1, gdalconst.GDT_Float32)
         dst.SetGeoTransform(match_geotrans)
         dst.SetProjection(match_proj)
@@ -249,12 +248,13 @@ for files in rdList:
 #-------
 #update output dir
 msgList = os.listdir(msg_out)
+
 fileEnding = "CRS_pixelResample.tif"
 for files in msgList:
     if files.endswith(fileEnding):
         filename = os.path.join(msg_out, files)
         dataset = gdal.Open(filename)
-        outfile = msg_out + files[0:23] + "_CRS_Resample_bbox.tif"
+        outfile = msg_out + files[0:22] + "_CRS_Resample_bbox.tif"
         #extract regional subset to new geotiff
         gdal.Translate(outfile, dataset, projWin = [minX, maxY, maxX, minY])
         #close dataset

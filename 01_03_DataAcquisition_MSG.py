@@ -10,6 +10,7 @@ workingDir = "C:/Users/tamta/Documents/Studium/02_Master/17_Masterarbeit/03_Data
 outputDir = "C:/Users/tamta/Documents/Studium/02_Master/17_Masterarbeit/03_Data/MSGSpectral_Raster/"
 
 filelist = os.listdir(workingDir)
+
 fileEnding = ".nc"
 
 #------------------------------------------------------------------------------
@@ -60,4 +61,4 @@ for files in filelist:
             #subset.plot()
         
             #save as .tif
-            subset.rio.to_raster(outputDir + "MSG_201707011300_" + channels + ".tif")
+            subset.rio.to_raster(outputDir + "/MSG_"+ files[13:24] +"_" + channels + ".tif")
