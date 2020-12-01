@@ -26,19 +26,25 @@ rdList = os.listdir(workingDir + rdDir)
 msgList = os.listdir(workingDir + msgDir)
 
 ###############################################################################
+#SPECIAL FOR PARTLY DATA INTERSECTION DEZEMBER 2017
+#--------------------------------------------------
+ctList = [element for element in ctList if element[7:9] == "12"]
+rdList = [element for element in rdList if element[12:14] == "12"]
+msgList = [element for element in msgList if element[8:10] == "12"]
+
 #SPECIAL FOR PARTLY DATA INTERSECTION JULY 2017
 #----------------------------------------------
-#remove all ct values from Dezember
-ctList = [element for element in ctList if element[7:9] != "12"]
-#remove the incomplete date 11.07. from the ct data
-ctList = [element for element in ctList if element[9:11] != "11"]
+# #remove all ct values from Dezember
+# ctList = [element for element in ctList if element[7:9] != "12"]
+# #remove the incomplete date 11.07. from the ct data
+# ctList = [element for element in ctList if element[9:11] != "11"]
 
-#the same for radolan
-rdList = rdList[1:len(rdList)]
-rdList = [element for element in rdList if element[12:14] != "12"]
-#all dates that are not yet extracted: np.arange(11,32)
-for i in np.arange(11,32):
-    rdList = [element for element in rdList if element[14:16] != str(i)]   
+# #the same for radolan
+# rdList = rdList[1:len(rdList)]
+# rdList = [element for element in rdList if element[12:14] != "12"]
+# #all dates that are not yet extracted: np.arange(11,32)
+# for i in np.arange(11,32):
+#     rdList = [element for element in rdList if element[14:16] != str(i)]   
 ###############################################################################
 #------------------------------------------------------------------------------
 # 2 DATA INTERSECTION
@@ -73,6 +79,9 @@ dayList.sort()
 #--------
 #loop over days
 for days in dayList:
+    #create empty dataframe for output storage
+    df = pd.DataFrame(columns = ["acquisitionDate", "lat", "lon", "weather", "cloudType", "precipitation", "IR_039", "IR_087", "IR_097", "IR_108", "IR_120", "IR_134", "WV_062", "WV_073"])
+    
     #loop over timelist to extract all records from i'th day
     timeList_day = []
     for elements in timeList:
@@ -84,7 +93,7 @@ for days in dayList:
     dateList = []
     for dates in timeList_day:
         dateList = dateList + [(dates[0:4] + "-" + dates[4:6] + "-" + dates[6:8] + " " + dates[8:10] + ":" + dates[10:12])]
-   
+
     #actual data extraction
     for timesteps in timeList_day:
         #print(timesteps)
@@ -94,17 +103,18 @@ for days in dayList:
                 filenameCT = os.path.join(workingDir+ctDir+filesCT)
                 ct = rasterio.open(filenameCT)
                 ctData = ct.read(1)
-                #--------------------------------------------------------------
+                 #--------------------------------------------------------------
                 #iterate over the coordinates and retrieve lat lon
                 #only one time needed
-                if filesCT.endswith(str(timeList_day[0]+"_CRS_"+fileEnding)):
+                if filesCT.endswith(str(timeList[0]+"_CRS_"+fileEnding)):
                     #create storage DF
                     latDF = pd.DataFrame(columns = [np.arange(0,ct.width)], index = np.arange(0,ct.height))
                     lonDF = pd.DataFrame(columns = [np.arange(0,ct.width)], index = np.arange(0,ct.height))
                     for row in np.arange(0,ct.height):
+                        print(row)
                         for col in np.arange(0,ct.width):
-                            latDF.iloc[row,col] = rasterio.transform.xy(transform = ct.transform, rows = row, cols = col)[1]
-                            lonDF.iloc[row,col] = rasterio.transform.xy(transform = ct.transform, rows = row, cols = col)[0]
+                              latDF.iloc[row,col] = rasterio.transform.xy(transform = ct.transform, rows = row, cols = col)[1]
+                              lonDF.iloc[row,col] = rasterio.transform.xy(transform = ct.transform, rows = row, cols = col)[0]
                 #------------------------------------------------------------------
                 ct.close()
         
@@ -117,7 +127,7 @@ for days in dayList:
                 rad.close()
                 #set nodata values 
                 rdData[rdData == -9999.] = np.nan
-                
+                  
         #extract the weather situation
         #onle one time needed
         if timesteps == timeList_day[0]:
@@ -133,7 +143,7 @@ for days in dayList:
         #define an extra list for each timestep
         MSG_timestep_list = []
         for filesMSG in msgList:
-            #slightly adapted filtering caused by MSG channel information in between
+            #slightly adapted filtering technique caused by MSG channel information in between
             if filesMSG.endswith("CRS_Resample_"+fileEnding) and filesMSG.startswith("MSG_"+timesteps):
                 MSG_timestep_list = MSG_timestep_list + [filesMSG]
         
@@ -146,7 +156,7 @@ for days in dayList:
         for elements in MSG_timestep_list:
             #filter for channel
             for channels in allChannels:
-                if elements[17:23] == channels:
+                if elements[16:22] == channels:
                     filenameMSG = os.path.join(workingDir+msgDir, elements)
                     msg = rasterio.open(filenameMSG)
                     msg_channelData[list.index(allChannels, channels)] = msg.read(1)
@@ -156,9 +166,6 @@ for days in dayList:
         # 3 DATA COLLECTION AND WRITING TO DISK
         #--------------------------------------------------------------------------
         #store ct and rad in df
-        #create empty dataframe for output storage
-        df = pd.DataFrame(columns = ["acquisitionDate", "lat", "lon", "weather", "cloudType", "precipitation", "IR_039", "IR_087", "IR_097", "IR_108", "IR_120", "IR_134", "WV_062", "WV_073"])
-
         #acquisition date: to get the correct date for each scene (array with 233x173 pixel), 
         #  the date is converted from "201712010015" to "2017-12-01 00:15"
         data = {"acquisitionDate":dateList[timeList_day.index(timesteps)], 
@@ -174,8 +181,8 @@ for days in dayList:
         df = pd.concat(frame)
 
     #write to disk
-    #df.to_csv(workingDir+outdir+"CT_RD_intersection_12" + days + ".csv",sep = ",")
-    df.to_csv(workingDir+outdir+"CT_RD_intersection_07" + days + "_TEST.csv",sep = ",")
+    df.to_csv(workingDir+outdir+"CT_RD_intersection_12" + days + ".csv",sep = ",")
+    #df.to_csv(workingDir+outdir+"CT_RD_intersection_07" + days + "_TEST.csv",sep = ",")
     
 #------------------------------------------------------------------------------
 # 3 PLOTTING
