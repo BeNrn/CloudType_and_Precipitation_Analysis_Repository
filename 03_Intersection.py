@@ -25,31 +25,30 @@ ctList = os.listdir(workingDir + ctDir)
 rdList = os.listdir(workingDir + rdDir)
 msgList = os.listdir(workingDir + msgDir)
 
-###############################################################################
-#SPECIAL FOR PARTLY DATA INTERSECTION DEZEMBER 2017
-#--------------------------------------------------
-ctList = [element for element in ctList if element[7:9] == "12"]
-rdList = [element for element in rdList if element[12:14] == "12"]
-msgList = [element for element in msgList if element[8:10] == "12"]
+#------------------------------------------------------------------------------
+# 2 CHOOSE MONTH THAT SHOULD BE PROCESSED
+#------------------------------------------------------------------------------
+#december = "12"
+#july = "07"
+#ctList = [element for element in ctList if element[7:9] == "12"]
+ctList = [element for element in ctList if element[7:9] == "07"]
+#rdList = [element for element in rdList if element[12:14] == "12"]
+rdList = [element for element in rdList if element[12:14] == "07"]
+#msgList = [element for element in msgList if element[8:10] == "12"]
+msgList = [element for element in msgList if element[8:10] == "07"]
 
 #SPECIAL FOR PARTLY DATA INTERSECTION JULY 2017
 #----------------------------------------------
-# #remove all ct values from Dezember
-# ctList = [element for element in ctList if element[7:9] != "12"]
-# #remove the incomplete date 11.07. from the ct data
-# ctList = [element for element in ctList if element[9:11] != "11"]
+#test for 01.07.2017
+#filter only 1.7.
+# ctList = [element for element in ctList if element[9:11] == "01"]
+# rdList = [element for element in rdList if element[14:16] == "01"]
+# msgList = [element for element in msgList if element[10:12] == "07"]
 
-# #the same for radolan
-# rdList = rdList[1:len(rdList)]
-# rdList = [element for element in rdList if element[12:14] != "12"]
-# #all dates that are not yet extracted: np.arange(11,32)
-# for i in np.arange(11,32):
-#     rdList = [element for element in rdList if element[14:16] != str(i)]   
-###############################################################################
 #------------------------------------------------------------------------------
-# 2 DATA INTERSECTION
+# 3 DATA INTERSECTION
 #------------------------------------------------------------------------------
-#2.1 Preliminary settings
+#3.1 Preliminary settings
 #------------------------
 fileEnding = "bbox.tif"
 
@@ -71,7 +70,7 @@ for days in timeList:
 dayList = list(set(dayList))
 dayList.sort()
 
-#2.2 Loop over all single days
+#3.2 Loop over all single days
 #-----------------------------
 #Prerequisites:
 #[X] adjust the month of the weather classification
@@ -163,7 +162,7 @@ for days in dayList:
                     msg.close()
                      
         #--------------------------------------------------------------------------
-        # 3 DATA COLLECTION AND WRITING TO DISK
+        # 4 DATA COLLECTION AND WRITING TO DISK
         #--------------------------------------------------------------------------
         #store ct and rad in df
         #acquisition date: to get the correct date for each scene (array with 233x173 pixel), 
@@ -185,7 +184,7 @@ for days in dayList:
     #df.to_csv(workingDir+outdir+"CT_RD_intersection_07" + days + "_TEST.csv",sep = ",")
     
 #------------------------------------------------------------------------------
-# 3 PLOTTING
+# 5 PLOTTING
 #------------------------------------------------------------------------------
 # fig, ((ax1, ax2), (ax3, ax4), (ax5, ax6)) = plt.subplots(3, 2)
 # fig.tight_layout(pad=2.0)

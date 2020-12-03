@@ -36,7 +36,7 @@ library(gridExtra)
 #1 LOAD THE DATA
 #-------------------------------------------------------------------------------
 fileList <- list.files(paste0(dataDir, "Intersection_CT_RD/"))
-fileList <- fileList[2]
+fileList <- fileList[23]
 
 #1.1 for hierarchical cluster analysis and kmean scenario 1 and 3
 #----------------------------------------------------------------
@@ -55,7 +55,7 @@ for(files in fileList){
   df <- df[df$cloudType != 0,] #clear
   df <- df[df$cloudType != 7,] #cirrus
   
-  #draw a sample of the valid data values
+  #draw a sample from the valid data values
   #when there are less than 10000 entries take all of them 
   set.seed(121212)
   if(nrow(df) > 10000){
@@ -111,9 +111,9 @@ for(files in fileList){
   #draw a sample of the valid data values
   #when there are less than 10000 entries take all of them 
   set.seed(121212)
-  #if(nrow(df) > 10000){
-  #  df <- df[sample(1:nrow(df), 10000),]
-  #}
+  if(nrow(df) > 10000){
+    df <- df[sample(1:nrow(df), 10000),]
+  }
   
   df$cloudType <- as.factor(df$cloudType)
   #rename the cloud types
@@ -136,7 +136,7 @@ for(files in fileList){
   }
 }
 df_allArea <- df_total
-rm(df_total)
+rm(df_total, df)
 
 #draw a sample
 set.seed(100)
@@ -236,11 +236,11 @@ cluster <- kmeans(smp_totalDF, center = 4)
 fviz_dist(dm, gradient = list(low = "#00AFBB", mid = "white", high = "#FC4E07"))
 
 #3.4 compare cluster results for different class numbers
-cluster_2 <- kmeans(x = smp_totalDF, centers = 2)
-cluster_3 <- kmeans(x = smp_totalDF, centers = 3)
+cluster_2 <- kmeans(x = smp_totalDF, centers = 2, nstart = 25)
+cluster_3 <- kmeans(x = smp_totalDF, centers = 3, nstart = 25)
 cluster_4 <- kmeans(x = smp_totalDF, centers = 4, nstart = 25)
-cluster_5 <- kmeans(x = smp_totalDF, centers = 5)
-cluster_6 <- kmeans(x = smp_totalDF, centers = 6)
+cluster_5 <- kmeans(x = smp_totalDF, centers = 5, nstart = 25)
+cluster_6 <- kmeans(x = smp_totalDF, centers = 6, nstart = 25)
 
 p2 <- fviz_cluster(cluster_2, geom = "point", data = smp_totalDF) + ggtitle("k = 2")
 p3 <- fviz_cluster(cluster_3, geom = "point", data = smp_totalDF) + ggtitle("k = 3")
@@ -287,7 +287,7 @@ cluster <- kmeans(smp_totalDF, center = 4, nstart = 25)
 smp_totalDF %>% mutate(ClusterGroup = cluster$cluster) %>% group_by(ClusterGroup) %>% summarise_all("mean")
 df_out <- df %>% mutate(ClusterGroup = cluster$cluster)
 
-write.csv(df_out, paste0(dataDir, "ClusterAnalysis/01_07_2017_13Uhr_kmeans_scenario1.csv"), row.names = F)
+write.csv(df_out, paste0(dataDir, "ClusterAnalysis/12_12_2017_02Uhr_kmeans_scenario1.csv"), row.names = F)
 
 #-------------------------------------------------------------------------------
 #4 CLUSTER ANALYSIS - PARTITIONING  CLUSTERING  //Scenario 2//
@@ -303,11 +303,11 @@ smp_totalDF$acquisitionDate <- NULL
 smp_totalDF$weather <- NULL
 
 #visualize different cluster groups
-cluster_2 <- kmeans(x = smp_totalDF, centers = 2)
-cluster_3 <- kmeans(x = smp_totalDF, centers = 3)
+cluster_2 <- kmeans(x = smp_totalDF, centers = 2, nstart = 25)
+cluster_3 <- kmeans(x = smp_totalDF, centers = 3, nstart = 25)
 cluster_4 <- kmeans(x = smp_totalDF, centers = 4, nstart = 25)
-cluster_5 <- kmeans(x = smp_totalDF, centers = 5)
-cluster_6 <- kmeans(x = smp_totalDF, centers = 6)
+cluster_5 <- kmeans(x = smp_totalDF, centers = 5, nstart = 25)
+cluster_6 <- kmeans(x = smp_totalDF, centers = 6, nstart = 25)
 
 p2 <- fviz_cluster(cluster_2, geom = "point", data = smp_totalDF) + ggtitle("k = 2")
 p3 <- fviz_cluster(cluster_3, geom = "point", data = smp_totalDF) + ggtitle("k = 3")
@@ -335,14 +335,14 @@ fviz_gap_stat(gap_stat)
 #1 or 6
 
 ##final cluster analysis
-cluster <- kmeans(smp_totalDF, center = 4, nstart = 25)
-#cluster <- kmeans(smp_totalDF, center = 3, nstart = 25)
+#cluster <- kmeans(smp_totalDF, center = 4, nstart = 25)
+cluster <- kmeans(smp_totalDF, center = 3, nstart = 25)
 #save to disk
 smp_totalDF %>% mutate(ClusterGroup = cluster$cluster) %>% group_by(ClusterGroup) %>% summarise_all("mean")
 df_out <- df_allArea %>% mutate(ClusterGroup = cluster$cluster)
 
-write.csv(df_out, paste0(dataDir, "ClusterAnalysis/01_07_2017_13Uhr_kmeans_scenario2_4klassen.csv"), row.names = F)
-write.csv(df_out, paste0(dataDir, "ClusterAnalysis/01_07_2017_13Uhr_kmeans_scenario2"), row.names = F)
+#write.csv(df_out, paste0(dataDir, "ClusterAnalysis/01_07_2017_13Uhr_kmeans_scenario2_4klassen.csv"), row.names = F)
+write.csv(df_out, paste0(dataDir, "ClusterAnalysis/12_12_2017_02Uhr_kmeans_scenario2.csv"), row.names = F)
 
 #-------------------------------------------------------------------------------
 #4 CLUSTER ANALYSIS - PARTITIONING  CLUSTERING  //Scenario 3//
@@ -359,11 +359,11 @@ smp_totalDF$weather <- NULL
 smp_totalDF$precipitation <- NULL
 
 #visualize different cluster groups
-cluster_2 <- kmeans(x = smp_totalDF, centers = 2)
-cluster_3 <- kmeans(x = smp_totalDF, centers = 3)
+cluster_2 <- kmeans(x = smp_totalDF, centers = 2, nstart = 25)
+cluster_3 <- kmeans(x = smp_totalDF, centers = 3, nstart = 25)
 cluster_4 <- kmeans(x = smp_totalDF, centers = 4, nstart = 25)
-cluster_5 <- kmeans(x = smp_totalDF, centers = 5)
-cluster_6 <- kmeans(x = smp_totalDF, centers = 6)
+cluster_5 <- kmeans(x = smp_totalDF, centers = 5, nstart = 25)
+cluster_6 <- kmeans(x = smp_totalDF, centers = 6, nstart = 25)
 
 p2 <- fviz_cluster(cluster_2, geom = "point", data = smp_totalDF) + ggtitle("k = 2")
 p3 <- fviz_cluster(cluster_3, geom = "point", data = smp_totalDF) + ggtitle("k = 3")
@@ -396,7 +396,7 @@ cluster <- kmeans(smp_totalDF, center = 4, nstart = 25)
 smp_totalDF %>% mutate(ClusterGroup = cluster$cluster) %>% group_by(ClusterGroup) %>% summarise_all("mean")
 df_out <- df %>% mutate(ClusterGroup = cluster$cluster)
 
-write.csv(df_out, paste0(dataDir, "ClusterAnalysis/01_07_2017_13Uhr_kmeans_scenario3.csv"), row.names = F)
+write.csv(df_out, paste0(dataDir, "ClusterAnalysis/12_12_2017_02Uhr_kmeans_scenario3.csv"), row.names = F)
 
 #-------------------------------------------------------------------------------
 #4 CLUSTER ANALYSIS - PARTITIONING  CLUSTERING  //Scenario 4//
@@ -445,11 +445,11 @@ fviz_gap_stat(gap_stat)
 #1 or 6
 
 ##final cluster analysis
-cluster <- kmeans(smp_totalDF, center = 4, nstart = 25)
-#cluster <- kmeans(smp_totalDF, center = 3, nstart = 25)
+#cluster <- kmeans(smp_totalDF, center = 4, nstart = 25)
+cluster <- kmeans(smp_totalDF, center = 3, nstart = 25)
 #save to disk
 smp_totalDF %>% mutate(ClusterGroup = cluster$cluster) %>% group_by(ClusterGroup) %>% summarise_all("mean")
 df_out <- df_allArea %>% mutate(ClusterGroup = cluster$cluster)
 
-write.csv(df_out, paste0(dataDir, "ClusterAnalysis/01_07_2017_13Uhr_kmeans_scenario4_4klassen.csv"), row.names = F)
-#write.csv(df_out, paste0(dataDir, "ClusterAnalysis/01_07_2017_13Uhr_kmeans_scenario4.csv"), row.names = F)
+#write.csv(df_out, paste0(dataDir, "ClusterAnalysis/01_07_2017_13Uhr_kmeans_scenario4_4klassen.csv"), row.names = F)
+write.csv(df_out, paste0(dataDir, "ClusterAnalysis/12_12_2017_02Uhr_kmeans_scenario4.csv"), row.names = F)

@@ -11,6 +11,7 @@ from osgeo import ogr, gdal, gdalconst
 # 1 SET FOLDER PATH
 #------------------------------------------------------------------------------
 workingDir = "C:/Users/tamta/Documents/Studium/02_Master/17_Masterarbeit/03_Data/"
+#workingDir = "D:/MA_data/"
 
 ctDir = "CloudType_Raster/"
 rdDir = "Radolan_Raster/"
@@ -117,7 +118,7 @@ fileEnding = "CRStransform.tif"
 for files in rdList:
     if files.endswith(fileEnding):
         filename = os.path.join(rd_out, files)
-
+        
         # The file which should be resampled
         src = gdal.Open(filename, gdalconst.GA_ReadOnly)
         src_proj = src.GetProjection()
@@ -132,17 +133,18 @@ for files in rdList:
         high = match.RasterYSize
 
         # Output / destination
-        #dst_filename = rd_out+"/Radolan_"+files[8:20]+"_CRS_pixelResample.tif"
-        dst_filename = rd_out+"/Radolan_"+files[8:20]+"_CRS_pixelResample.tif"
+        dst_filename = rd_out+"/Radolan_"+files[8:20]+"_CRS_pixelResample.tif""
+        #dst_filename = workingDir + "CRS_pixel/Radolan_"+files[8:20]+"_CRS_pixelResample.tif"
+        
         dst = gdal.GetDriverByName('GTiff').Create(dst_filename, wide, high, 1, gdalconst.GDT_Float32)
         dst.SetGeoTransform(match_geotrans)
         dst.SetProjection(match_proj)
         
         #set no data to -9999
         #as SetNoData is a raster band method, the raster band must be called first
-        #dst_band = dst.GetRasterBand(1)
-        #dst_band.SetNoDataValue(-9999)
-        #dst_band = None
+        dst_band = dst.GetRasterBand(1)
+        dst_band.SetNoDataValue(-9999)
+        dst_band = None
 
         # Do the work
         #using the bilinear matching
@@ -183,9 +185,9 @@ for files in msgList:
         
         #set no data to -9999
         #as SetNoData is a raster band method, the raster band must be called first
-        #dst_band = dst.GetRasterBand(1)
-        #dst_band.SetNoDataValue(-9999)
-        #dst_band = None
+        dst_band = dst.GetRasterBand(1)
+        dst_band.SetNoDataValue(-9999)
+        dst_band = None
 
         # Do the work
         #using the bilinear matching
@@ -198,6 +200,7 @@ del high, match, match_geotrans, match_proj, wide
 # 5 MASKING THE GERMAN COUNTRY BOUNDING BOX
 #------------------------------------------------------------------------------
 shpPath = workingDir + "Verwaltungsgebiet_Deutschland/VG250_STA.shp"
+#shpPath = "C:/Users/tamta/Documents/Studium/02_Master/17_Masterarbeit/03_Data/Verwaltungsgebiet_Deutschland/VG250_STA.shp"
 
 #get bounding box coordinates
 driver = ogr.GetDriverByName("ESRI Shapefile")
@@ -216,10 +219,6 @@ del driver, vector, layer, feature, geom
 ctList = os.listdir(ct_out)
 fileEnding = "CRStransform.tif"
     
-# for files in ctList:
-#     if files.endswith(fileEnding):
-
-
 for files in ctList:
     if files.endswith(fileEnding):
         filename = os.path.join(ct_out, files)
@@ -233,12 +232,15 @@ for files in ctList:
 #5.2 Rad
 #-------
 rdList = os.listdir(rd_out)
+#rdList = os.listdir(workingDir+"CRS_pixel/")
 fileEnding = "CRS_pixelResample.tif"
 for files in rdList:
     if files.endswith(fileEnding):
         filename = os.path.join(rd_out, files)
+        #filename = os.path.join(workingDir+"CRS_pixel/", files)
         dataset = gdal.Open(filename)
         outfile = rd_out+"/Radolan_"+files[8:20]+"_CRS_Resample_bbox.tif"
+        #outfile = workingDir + "Bbox/Radolan_"+files[8:20]+"_CRS_Resample_bbox.tif"
         #extract regional subset to new geotiff
         gdal.Translate(outfile, dataset, projWin = [minX, maxY, maxX, minY])
         #close dataset

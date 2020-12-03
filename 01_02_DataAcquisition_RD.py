@@ -8,6 +8,7 @@ warnings.filterwarnings('ignore')
 # 1 UNZIP THE DATA
 #------------------------------------------------------------------------------
 workingDir = "C:/Users/tamta/Documents/Studium/02_Master/17_Masterarbeit/03_Data/Radolan_bin/"
+#workingDir = "D:/MA_data/"
 
 monthFolder = os.listdir(workingDir+"monthFolder")
 monthDir = workingDir+"monthFolder/"+monthFolder[0]
@@ -28,9 +29,11 @@ for month in dayFolder:
 #------------------------------------------------------------------------------
 # 2 SET FOLDER PATHS
 #------------------------------------------------------------------------------
-outdir = "C:/Users/tamta/Documents/Studium/02_Master/17_Masterarbeit/03_Data/Radolan_Raster"
+#outdir = "C:/Users/tamta/Documents/Studium/02_Master/17_Masterarbeit/03_Data/Radolan_Raster"
+outdir = workingDir + "Radolan_Raster"
 filelist = os.listdir(fullPath_out)
-fileEnding = "bin"
+#filter relevant steps
+fileEnding = ("00-dwd---bin", "15-dwd---bin", "30-dwd---bin", "45-dwd---bin")
 
 #------------------------------------------------------------------------------
 # 3 WRITE AS GEOTIFF
