@@ -41,9 +41,9 @@ msgList = [element for element in msgList if element[8:10] == "07"]
 #----------------------------------------------
 #test for 01.07.2017
 #filter only 1.7.
-# ctList = [element for element in ctList if element[9:11] == "01"]
-# rdList = [element for element in rdList if element[14:16] == "01"]
-# msgList = [element for element in msgList if element[10:12] == "07"]
+ctList = [element for element in ctList if element[9:11] == "01"]
+rdList = [element for element in rdList if element[14:16] == "01"]
+msgList = [element for element in msgList if element[10:12] == "01"]
 
 #------------------------------------------------------------------------------
 # 3 DATA INTERSECTION
@@ -180,8 +180,8 @@ for days in dayList:
         df = pd.concat(frame)
 
     #write to disk
-    df.to_csv(workingDir+outdir+"CT_RD_intersection_12" + days + ".csv",sep = ",")
-    #df.to_csv(workingDir+outdir+"CT_RD_intersection_07" + days + "_TEST.csv",sep = ",")
+    #df.to_csv(workingDir+outdir+"CT_RD_intersection_12" + days + ".csv",sep = ",")
+    df.to_csv(workingDir+outdir+"CT_RD_intersection_07" + days + "_TEST.csv",sep = ",")
     
 #------------------------------------------------------------------------------
 # 5 PLOTTING

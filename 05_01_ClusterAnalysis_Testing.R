@@ -36,10 +36,13 @@ library(gridExtra)
 #1 LOAD THE DATA
 #-------------------------------------------------------------------------------
 fileList <- list.files(paste0(dataDir, "Intersection_CT_RD/"))
-fileList <- fileList[23]
+fileList <- fileList[2]
 
 #1.1 for hierarchical cluster analysis and kmean scenario 1 and 3
 #----------------------------------------------------------------
+#extraction of test days:
+#date = "2017-12-12 13:00"
+date = "2017-07-01 13:00"
 
 for(files in fileList){
   print(files)
@@ -54,6 +57,9 @@ for(files in fileList){
   df <- df[!is.na(df$cloudType),] #NA
   df <- df[df$cloudType != 0,] #clear
   df <- df[df$cloudType != 7,] #cirrus
+  
+  #filter single scenes
+  df <- df[df$acquisitionDate == date,]
   
   #draw a sample from the valid data values
   #when there are less than 10000 entries take all of them 
@@ -107,6 +113,9 @@ for(files in fileList){
   df <- df[!is.na(df$cloudType),] #NA
   df <- df[df$cloudType != 0,] #clear
   df <- df[df$cloudType != 7,] #cirrus
+  
+  #filter single scenes
+  df <- df[df$acquisitionDate == date,]
   
   #draw a sample of the valid data values
   #when there are less than 10000 entries take all of them 
@@ -216,7 +225,7 @@ fviz_gap_stat(gap_stat)
 # - https://uc-r.github.io/kmeans_clustering
 # - Handl, A., & Kuhlenkasper, T. (2017). Multivariate Analysemethoden. https://doi.org/10.1007/978-3-662-54754-0 (Kapitel 13 - Clusteranalyse)
 
-#3.1 prepare  the data
+#3.1 prepare the data
 smp_totalDF <- df
 head(smp_totalDF)
 smp_totalDF$lat <- NULL
@@ -287,8 +296,8 @@ cluster <- kmeans(smp_totalDF, center = 4, nstart = 25)
 smp_totalDF %>% mutate(ClusterGroup = cluster$cluster) %>% group_by(ClusterGroup) %>% summarise_all("mean")
 df_out <- df %>% mutate(ClusterGroup = cluster$cluster)
 
-write.csv(df_out, paste0(dataDir, "ClusterAnalysis/12_12_2017_02Uhr_kmeans_scenario1.csv"), row.names = F)
-
+#write.csv(df_out, paste0(dataDir, "ClusterAnalysis/12_12_2017_13Uhr_kmeans_scenario1.csv"), row.names = F)
+write.csv(df_out, paste0(dataDir, "ClusterAnalysis/01_07_2017_13Uhr_kmeans_scenario1.csv"), row.names = F)
 #-------------------------------------------------------------------------------
 #4 CLUSTER ANALYSIS - PARTITIONING  CLUSTERING  //Scenario 2//
 #-------------------------------------------------------------------------------
@@ -301,6 +310,7 @@ smp_totalDF$lon <- NULL
 smp_totalDF$cloudType <- NULL
 smp_totalDF$acquisitionDate <- NULL
 smp_totalDF$weather <- NULL
+head(smp_totalDF)
 
 #visualize different cluster groups
 cluster_2 <- kmeans(x = smp_totalDF, centers = 2, nstart = 25)
@@ -341,8 +351,8 @@ cluster <- kmeans(smp_totalDF, center = 3, nstart = 25)
 smp_totalDF %>% mutate(ClusterGroup = cluster$cluster) %>% group_by(ClusterGroup) %>% summarise_all("mean")
 df_out <- df_allArea %>% mutate(ClusterGroup = cluster$cluster)
 
-#write.csv(df_out, paste0(dataDir, "ClusterAnalysis/01_07_2017_13Uhr_kmeans_scenario2_4klassen.csv"), row.names = F)
-write.csv(df_out, paste0(dataDir, "ClusterAnalysis/12_12_2017_02Uhr_kmeans_scenario2.csv"), row.names = F)
+#write.csv(df_out, paste0(dataDir, "ClusterAnalysis/12_12_2017_13Uhr_kmeans_scenario2.csv"), row.names = F)
+write.csv(df_out, paste0(dataDir, "ClusterAnalysis/01_07_2017_13Uhr_kmeans_scenario2.csv"), row.names = F)
 
 #-------------------------------------------------------------------------------
 #4 CLUSTER ANALYSIS - PARTITIONING  CLUSTERING  //Scenario 3//
@@ -396,7 +406,8 @@ cluster <- kmeans(smp_totalDF, center = 4, nstart = 25)
 smp_totalDF %>% mutate(ClusterGroup = cluster$cluster) %>% group_by(ClusterGroup) %>% summarise_all("mean")
 df_out <- df %>% mutate(ClusterGroup = cluster$cluster)
 
-write.csv(df_out, paste0(dataDir, "ClusterAnalysis/12_12_2017_02Uhr_kmeans_scenario3.csv"), row.names = F)
+#write.csv(df_out, paste0(dataDir, "ClusterAnalysis/12_12_2017_13Uhr_kmeans_scenario3.csv"), row.names = F)
+write.csv(df_out, paste0(dataDir, "ClusterAnalysis/01_07_2017_13Uhr_kmeans_scenario3.csv"), row.names = F)
 
 #-------------------------------------------------------------------------------
 #4 CLUSTER ANALYSIS - PARTITIONING  CLUSTERING  //Scenario 4//
@@ -451,5 +462,6 @@ cluster <- kmeans(smp_totalDF, center = 3, nstart = 25)
 smp_totalDF %>% mutate(ClusterGroup = cluster$cluster) %>% group_by(ClusterGroup) %>% summarise_all("mean")
 df_out <- df_allArea %>% mutate(ClusterGroup = cluster$cluster)
 
-#write.csv(df_out, paste0(dataDir, "ClusterAnalysis/01_07_2017_13Uhr_kmeans_scenario4_4klassen.csv"), row.names = F)
-write.csv(df_out, paste0(dataDir, "ClusterAnalysis/12_12_2017_02Uhr_kmeans_scenario4.csv"), row.names = F)
+#write.csv(df_out, paste0(dataDir, "ClusterAnalysis/12_12_2017_13Uhr_kmeans_scenario4.csv"), row.names = F)
+write.csv(df_out, paste0(dataDir, "ClusterAnalysis/01_07_2017_13Uhr_kmeans_scenario4.csv"), row.names = F)
+

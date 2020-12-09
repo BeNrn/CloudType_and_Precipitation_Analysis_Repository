@@ -197,7 +197,7 @@ rm(y, x, range, stdDev, alpha, beta)
 #8 KRUSKAL-WALLIS-TEST
 #-------------------------------------------------------------------------------
 kruskal.test(precipitation ~ cloudType, data = df)
-#-> there are significant differences between the groups as p < 0.005
+#-> there are significant differences between the groups as p < 0.05
 
 dunnResult <- FSA::dunnTest(precipitation ~ cloudType, data = df, method = "bh")
 dunnResult
