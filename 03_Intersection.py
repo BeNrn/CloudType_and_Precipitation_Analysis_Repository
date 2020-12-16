@@ -40,10 +40,15 @@ msgList = [element for element in msgList if element[8:10] == "07"]
 #SPECIAL FOR PARTLY DATA INTERSECTION JULY 2017
 #----------------------------------------------
 #test for 01.07.2017
-#filter only 1.7.
-ctList = [element for element in ctList if element[9:11] == "01"]
-rdList = [element for element in rdList if element[14:16] == "01"]
-msgList = [element for element in msgList if element[10:12] == "01"]
+#filter only 1. to 12.7.
+ctList = [element for element in ctList if int(element[9:11]) < 12]
+rdList = [element for element in rdList if int(element[14:16]) < 12]
+msgList = [element for element in msgList if int(element[10:12]) < 12]
+
+#filter only 1.07.
+#ctList = [element for element in ctList if element[9:11] == "01"]
+#rdList = [element for element in rdList if element[14:16] == "01"]
+#msgList = [element for element in msgList if element[10:12] == "01"]
 
 #------------------------------------------------------------------------------
 # 3 DATA INTERSECTION
@@ -110,7 +115,8 @@ for days in dayList:
                     latDF = pd.DataFrame(columns = [np.arange(0,ct.width)], index = np.arange(0,ct.height))
                     lonDF = pd.DataFrame(columns = [np.arange(0,ct.width)], index = np.arange(0,ct.height))
                     for row in np.arange(0,ct.height):
-                        print(row)
+                        #232 because python starts counting with 0, sums to 233 rows total
+                        print("LatLon extraction:" + str(row) + " of 232")
                         for col in np.arange(0,ct.width):
                               latDF.iloc[row,col] = rasterio.transform.xy(transform = ct.transform, rows = row, cols = col)[1]
                               lonDF.iloc[row,col] = rasterio.transform.xy(transform = ct.transform, rows = row, cols = col)[0]
@@ -181,7 +187,8 @@ for days in dayList:
 
     #write to disk
     #df.to_csv(workingDir+outdir+"CT_RD_intersection_12" + days + ".csv",sep = ",")
-    df.to_csv(workingDir+outdir+"CT_RD_intersection_07" + days + "_TEST.csv",sep = ",")
+    df.to_csv(workingDir+outdir+"CT_RD_intersection_07" + days + ".csv",sep = ",")
+    print("CT_RD_intersection_07" + str(days) + ".csv" " is written.")
     
 #------------------------------------------------------------------------------
 # 5 PLOTTING

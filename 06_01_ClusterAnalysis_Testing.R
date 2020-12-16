@@ -31,7 +31,7 @@ library(tidyverse)
 library(factoextra)
 library(cluster)
 library(gridExtra)
-
+library(fpc)
 #-------------------------------------------------------------------------------
 #1 LOAD THE DATA
 #-------------------------------------------------------------------------------
@@ -400,7 +400,7 @@ print(gap_stat, method = "firstmax")
 fviz_gap_stat(gap_stat)
 #1 or 4
 
-##final cluster analysis
+#final cluster analysis
 cluster <- kmeans(smp_totalDF, center = 4, nstart = 25)
 #save to disk
 smp_totalDF %>% mutate(ClusterGroup = cluster$cluster) %>% group_by(ClusterGroup) %>% summarise_all("mean")
@@ -464,4 +464,11 @@ df_out <- df_allArea %>% mutate(ClusterGroup = cluster$cluster)
 
 #write.csv(df_out, paste0(dataDir, "ClusterAnalysis/12_12_2017_13Uhr_kmeans_scenario4.csv"), row.names = F)
 write.csv(df_out, paste0(dataDir, "ClusterAnalysis/01_07_2017_13Uhr_kmeans_scenario4.csv"), row.names = F)
+
+#-------------------------------------------------------------------------------
+#5 CLUSTER ANALYSIS - VALIDATION
+#-------------------------------------------------------------------------------
+#d...distance matrix
+#clustering...cluster results
+fpc::cluster.stats(d = dm, clustering = df_out$ClusterGroup)
 

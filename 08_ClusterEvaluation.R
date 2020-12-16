@@ -12,13 +12,16 @@ list <- list[endsWith(list, ".csv")]
 df <- read.csv(paste0(dataDir, "Clusteranalysis/", list[1]))
 df$ClusterGroup <- as.factor(df$ClusterGroup)
 
+
 #statistics boxplot
 boxplot(df$precipitation[df$ClusterGroup == 1], ylim = c(0,1.4))
 summary(df$precipitation[df$ClusterGroup == 1])
 
-kruskal.test(precipitation ~ ClusterGroup, data = df)
+#Regressionstests sind nicht sauber, da diese die internen Fehler der Clusteranalyse nicht berücksichtigen können
+
+#kruskal.test(precipitation ~ ClusterGroup, data = df)
 #p-value = 0.02674
 #p-value < 0.05
 
-dunnResult <- FSA::dunnTest(precipitation ~ ClusterGroup, data = df, method = "bh")
-dunnResult
+#dunnResult <- FSA::dunnTest(precipitation ~ ClusterGroup, data = df, method = "bh")
+#dunnResult
