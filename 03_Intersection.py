@@ -29,7 +29,9 @@ msgList = os.listdir(workingDir + msgDir)
 # 2 CHOOSE MONTH THAT SHOULD BE PROCESSED
 #------------------------------------------------------------------------------
 #december = "12"
+#month = 12
 #july = "07"
+month = 7
 #ctList = [element for element in ctList if element[7:9] == "12"]
 ctList = [element for element in ctList if element[7:9] == "07"]
 #rdList = [element for element in rdList if element[12:14] == "12"]
@@ -41,9 +43,9 @@ msgList = [element for element in msgList if element[8:10] == "07"]
 #----------------------------------------------
 #test for 01.07.2017
 #filter only 1. to 12.7.
-ctList = [element for element in ctList if int(element[9:11]) < 12]
-rdList = [element for element in rdList if int(element[14:16]) < 12]
-msgList = [element for element in msgList if int(element[10:12]) < 12]
+ctList = [element for element in ctList if int(element[9:11]) < 15]
+rdList = [element for element in rdList if int(element[14:16]) < 15]
+msgList = [element for element in msgList if int(element[10:12]) < 15]
 
 #filter only 1.07.
 #ctList = [element for element in ctList if element[9:11] == "01"]
@@ -138,8 +140,7 @@ for days in dayList:
         if timesteps == timeList_day[0]:
             wSit = ws.weatherSituation(workingDir = workingDir, 
                                        filename = "PrecipitationValues_DWD/Wetterlagenklassifikation.txt", 
-                                       month = 12)
-                                       #month = 7)
+                                       month = month)
             wSit = wSit[int(days)-1]
             
         #extract the MSG channel data
