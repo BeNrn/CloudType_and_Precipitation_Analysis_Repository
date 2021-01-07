@@ -63,33 +63,27 @@ for(j in 1:length(list)){
                        df$acquisitionDate[1] %>% str_sub(12,13),
                        "_", 
                        df$acquisitionDate[1] %>% str_sub(15,16))
-      write.csv(df, paste0(dataDir, "/DaySlicing_NewGroups/Cluster_newGroups_", daytime, ".csv"))
+      write.csv(df, paste0(dataDir, "/DaySlicing_NewGroups/Cluster_newGroups_", daytime, ".csv"), row.names = F)
       }
     }
 }
 
-
 #-------------------------------------------------------------------------------
-#3 EVALUATION OF THE RESULTS
+#3 EVALUATION OF THE RESULTS "REGRESSION"
 #-------------------------------------------------------------------------------
-#the cluster groups building on each other as could be seen in the continuing
-# time series
+#the cluster groups building on each other presented in the continuing time 
+# series
 #that allows an evaluation of each group beyond one single scene
 #resulting in 5 groups (cluster 1 to 5) for July and 5 for December
 
 #3.1 choose the month
 #--------------------
-#month = "07"
-month = "12"
+month = "07"
+#month = "12"
 
-#3.2 choose the cluster group
-#-----------------------------
+#3.2 load the cluster groups
+#---------------------------
 clusGroup <- c("red", "green", "blue", "yellow", "grey")
-#clusGroup <- "red"
-#clusGroup <- "green"
-#clusGroup <- "blue"
-#clusGroup <- "yellow"
-#clusGroup <- "grey"
 
 #3.3 load and prepare the data
 #------------------------------
@@ -139,6 +133,33 @@ kruskal.test(precip ~ group, data = df_grps)
 
 dunnResult <- FSA::dunnTest(precip ~ group, data = df_grps, method = "bh")
 dunnResult
+
+#JUL
+# Comparison           Z       P.unadj         P.adj
+# 1    blue - green   0.6015328  5.474852e-01  6.843565e-01
+# 2     blue - grey  28.2493906 1.448089e-175 7.240446e-175
+# 3    green - grey  26.7596119 9.544379e-158 3.181460e-157
+# 4      blue - red   0.3933848  6.940353e-01  7.711504e-01
+# 5     green - red  -0.2935336  7.691143e-01  7.691143e-01
+# 6      grey - red -30.7060254 4.729441e-207 4.729441e-206
+# 7   blue - yellow   5.2181852  1.806847e-07  3.011412e-07
+# 8  green - yellow   4.3746169  1.216459e-05  1.737799e-05
+# 9   grey - yellow -24.4795210 2.441145e-132 6.102862e-132
+# 10   red - yellow   5.5025136  3.744144e-08  7.488288e-08
+
+#DEZ
+# Comparison          Z       P.unadj         P.adj
+# 1    blue - green  24.949736 2.149515e-137 2.149515e-136
+# 2     blue - grey  10.861360  1.761069e-27  3.522139e-27
+# 3    green - grey -13.100029  3.291319e-39  8.228297e-39
+# 4      blue - red   7.024731  2.144791e-12  3.063987e-12
+# 5     green - red -14.924410  2.286479e-50  7.621595e-50
+# 6      grey - red  -2.834580  4.588595e-03  4.588595e-03
+# 7   blue - yellow   3.304727  9.506899e-04  1.056322e-03
+# 8  green - yellow -23.785842 4.680229e-125 2.340114e-124
+# 9   grey - yellow  -8.558776  1.140718e-17  1.901196e-17
+# 10   red - yellow  -4.626044  3.727156e-06  4.658945e-06
+
 write.csv(dunnResult$res, paste0(workingDir, "07_Ergebnisse/DunnResult_clusterAnalysis_perNewGroup_Dez.csv"), row.names = F)
 #write.csv(dunnResult$res, paste0(workingDir, "07_Ergebnisse/DunnResult_clusterAnalysis_perNewGroup_Jul.csv"), row.names = F)
 
@@ -148,3 +169,70 @@ write.csv(dunnResult$res, paste0(workingDir, "07_Ergebnisse/DunnResult_clusterAn
 #https://de.wikipedia.org/wiki/Bootstrapping-Verfahren
 
 #https://en.wikipedia.org/wiki/Circular_analysis
+
+#-------------------------------------------------------------------------------
+#4 EVALUATION OF THE SPECTRAL GROUPS
+#-------------------------------------------------------------------------------
+#muss überarbeitet werden
+#boxplot daten abgreifen erlaubt kein späteres erstellen von Boxplots
+#stattdessen boxplots direkt aus daten generieren
+
+#########################
+#hier weiter
+########################
+
+#4.1 load the data like above
+#----------------------------
+month = "07"
+#month = "12"
+
+list <- list.files(paste0(dataDir, "DaySlicing_newGroups"))
+list <- list[str_sub(list, 24,25) == month]
+
+#4.2 prepare a df and predefinings
+#---------------------------------
+#predefinings 
+clusGroup <- c("red", "green", "blue", "yellow", "grey")
+channels <- c("IR_039", "IR_087", "IR_097", "IR_108", "IR_120", "IR_134", "WV_062", "WV_073")
+
+#three layers are necessary:
+# - month, regulated by datetime
+# - clustergroup, regulated by clustergroup name
+# - spectral channel, regulated by channel name
+rm(df_grps, df_temp, precip_clusGrp, precipVals)
+
+df_spec <- data.frame(datetime = NA, clusterGroup = NA, specChannel = NA, 
+                      bxpl_lowWhisk = NA, bxpl_lowHin = NA, bxpl_median = NA, bxpl_higWhisk = NA, bxpl_higHin = NA)
+
+#4.3 extract boxplot information 
+#--------------------------------
+#iterate over scenes
+for(i in 1:length(list)){
+  df_temp <- read.csv(paste0(dataDir, "DaySlicing_newGroups/", list[i]))
+  
+  #iterate over cluster elements
+  for(j in clusGroup){
+    df_clus_temp <- df_temp[df_temp$ClusterGroup_continuing == j,]
+    
+    #iterate over spectral channels
+    for(k in channels){
+      #information for df
+      datetime <- df_temp[1,1]
+      clusterGroup <- j
+      specChannel <- k
+      
+      dat <- boxplot.stats(df_clus_temp[,names(df_clus_temp) == k])[[1]]
+      if(is.na(df_spec[1,1])){
+        df_spec <- data.frame(datetime = datetime, clusterGroup = clusterGroup, specChannel = specChannel, 
+                              bxpl_lowWhisk = NA, bxpl_lowHin = NA, bxpl_median = NA, bxpl_higWhisk = NA, bxpl_higHin = NA)
+        df_spec[,4:8] <- dat
+      }else{
+        datrow <- c(datetime, clusterGroup, specChannel, dat)
+        df_spec <- rbind(df_spec, datrow)
+      }
+    }
+  }
+}
+
+#write.csv(df_spec, paste0(dataDir, "/SpectralBoxplots_Dez.csv"), row.names = F)
+write.csv(df_spec, paste0(dataDir, "/SpectralBoxplots_Jul.csv"), row.names = F)

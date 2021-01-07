@@ -1,11 +1,11 @@
 #- prior regression
 #- selection of a weather situation -> 39
-#- weather situation probably depicts rainevents in a good resolution 
+#- weather situation probably depicts rain events in a good resolution 
 #- cut days with this weather situation in its single scenes
-#- on single scenes cluster analysis should be performed and the propagation of the 
+#- cluster analysis should be performed on single scenes and the propagation of the 
 #identified cloud clusters should be monitored
 #a) the cloud clusters are building on each other -> the scenes could be analyzed together
-#b) the do not build on each other -> each scene should be analyzed by its own
+#b) the do not build on each other -> each scene should be analyzed on their own
 #ws...weather situation
 
 workingDir <- "C:/Users/tamta/Documents/Studium/02_Master/17_Masterarbeit/03_Data/"
@@ -26,7 +26,7 @@ library(tidyverse)
 #load the December 
 fileList <- list.files(paste0(workingDir, "Intersection_CT_RD/"))
 jul <- fileList[13]
-dez <- fileList[41]
+dez <- fileList[45]
 
 df <- read.csv(paste0(workingDir, "Intersection_CT_RD/", dez))[,-1]
 df <- read.csv(paste0(workingDir, "Intersection_CT_RD/", jul))[,-1]
@@ -64,23 +64,22 @@ for(i in 1:length(df_list)){
   smp$weather <- NULL
   smp$precipitation <- NULL
     
-    
-  # #test for the optimal class number statistically
-  # set.seed(123)
-  # #4.6.1 ellbow method
-  # fviz_nbclust(smp, kmeans, method = "wss")
-  # #3,4,5
-  # 
-  # #4.6.2 silhouette method
-  # fviz_nbclust(smp, kmeans, method = "silhouette")
-  # #2, 4
-  # 
-  # #4.6.3 gap method
-  # gap_stat <- clusGap(smp, FUN = kmeans, nstart = 25,
-  #                     K.max = 10, B = 50)
-  # print(gap_stat, method = "firstmax")
-  # fviz_gap_stat(gap_stat)
-  # #4,5,7
+  #test for the optimal class number statistically
+  set.seed(123)
+  #4.6.1 ellbow method
+  factoextra::fviz_nbclust(smp, kmeans, method = "wss")
+  #3,4,5
+
+  #4.6.2 silhouette method
+  factoextra::fviz_nbclust(smp, kmeans, method = "silhouette")
+  #2, 4
+
+  #4.6.3 gap method
+  gap_stat <- clusGap(smp, FUN = kmeans, nstart = 25,
+                      K.max = 10, B = 50)
+  print(gap_stat, method = "firstmax")
+  factoextra::fviz_gap_stat(gap_stat)
+  #4,5,7
   
   #final cluster analysis
   cluster <- kmeans(smp, center = 5, nstart = 25)
