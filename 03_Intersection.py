@@ -42,15 +42,15 @@ msgList = [element for element in msgList if element[8:10] == "07"]
 #SPECIAL FOR PARTLY DATA INTERSECTION JULY 2017
 #----------------------------------------------
 #test for 01.07.2017
-#filter only 1. to 12.7.
-ctList = [element for element in ctList if int(element[9:11]) < 15]
-rdList = [element for element in rdList if int(element[14:16]) < 15]
-msgList = [element for element in msgList if int(element[10:12]) < 15]
+#filter only 1. to 18.7.
+ctList = [element for element in ctList if int(element[9:11]) < 18]
+rdList = [element for element in rdList if int(element[14:16]) < 18]
+msgList = [element for element in msgList if int(element[10:12]) < 18]
 
-#filter only 1.07.
-#ctList = [element for element in ctList if element[9:11] == "01"]
-#rdList = [element for element in rdList if element[14:16] == "01"]
-#msgList = [element for element in msgList if element[10:12] == "01"]
+#filter only 18.07.
+# ctList = [element for element in ctList if element[9:11] == "18"]
+# rdList = [element for element in rdList if element[14:16] == "18"]
+# msgList = [element for element in msgList if element[10:12] == "18"]
 
 #------------------------------------------------------------------------------
 # 3 DATA INTERSECTION

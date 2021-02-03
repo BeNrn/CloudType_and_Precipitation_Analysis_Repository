@@ -3,12 +3,16 @@
 workingDir <- "C:/Users/tamta/Documents/Studium/02_Master/17_Masterarbeit/03_Data/"
 
 library(forcats)
+library(ggplot2)
+library(ggridges)
 
 #-------------------------------------------------------------------------------
 #1 LOAD THE DATA
 #-------------------------------------------------------------------------------
 fileList <- list.files(paste0(workingDir, "Intersection_CT_RD/"))
 #fileList <- fileList[1]
+
+set.seed(1212)
 
 for(files in fileList){
   print(files)
@@ -24,9 +28,14 @@ for(files in fileList){
   df <- df[df$cloudType != 0,] #clear
   df <- df[df$cloudType != 7,] #cirrus
   
+  #########################
+  #only water group is examined
+  #df <- df[df$cloudType == 3,]
+  #########################
+  
   #draw a sample of the valid data values
   #when there are less than 10000 entries take all of them 
-  set.seed(121212)
+  
   if(nrow(df) > 10000){
     df <- df[sample(1:nrow(df), 10000),]
   }
@@ -51,6 +60,7 @@ for(files in fileList){
     df_total <- rbind(df_total, df)
   }
 }
+
 df <- df_total
 rm(df_total)
 
@@ -64,7 +74,7 @@ hist(df$precipitation)
 plot(df$cloudType, df$precipitation,
      xlab = "Wolkenklassen",
      ylab = "Niederschlag in mm",
-     main = paste0("Niederschlagswerte in den einzelnen Wolkenklassen\n(n = ", as.character(nrow(df)), ")\nDez17+1.-10.Jul. - 10.000 Sample pro Tag"),
+     main = paste0("Niederschlagswerte in den einzelnen Wolkenklassen\n(n = ", as.character(nrow(df)), ")\nDez17+1.-18.Jul. - 10.000 Sample pro Tag"),
      log = "y",
      outline = F)
 
@@ -89,6 +99,13 @@ for(i in seq(1:length(unique(df$cloudType)))){
   #        ylim = c(0,3))
 }
 
+
+#ridge line plot
+ggplot(df, aes(x = precipitation, y = cloudType, fill = cloudType))+
+  geom_density_ridges(stat="binline", alpha=0.6, bins=16)+
+  theme_ridges()+ 
+  xlim(0, 1.5)+
+  theme(legend.position = "none")
 
 #-------------------------------------------------------------------------------
 #3 DATA WITH THE WEATHER SITUATION

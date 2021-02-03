@@ -11,6 +11,7 @@ library(FSA)
 #-------------------------------------------------------------------------------
 fileList <- list.files(paste0(file_base, "Intersection_CT_RD/"))
 #fileList <- fileList[1]
+set.seed(1212)
 
 for(files in fileList){
         print(files)
@@ -28,7 +29,6 @@ for(files in fileList){
         
         #draw a sample of the valid data values
         #when there are less than 10000 entries take all of them 
-        set.seed(121212)
         if(nrow(df) > 10000){
                 df <- df[sample(1:nrow(df), 10000),]
         }
@@ -201,28 +201,23 @@ kruskal.test(precipitation ~ cloudType, data = df)
 
 dunnResult <- FSA::dunnTest(precipitation ~ cloudType, data = df, method = "bh")
 dunnResult
-#                 Comparison          Z      P.unadj        P.adj
-# 1     opaque_ice - overlap -1.0568259 2.905910e-01 3.487092e-01 <- not significant
-# 2 opaque_ice - supercooled -3.2768600 1.049684e-03 1.574526e-03 <- significant, although water group is not part of it
-# 3    overlap - supercooled -0.5284487 5.971879e-01 5.971879e-01 <- not significant
-# 4       opaque_ice - water  8.6537070 4.985309e-18 1.495593e-17 <- water is quite different from the other groups
-# 5          overlap - water  7.6815953 1.571196e-14 3.142391e-14 <-  -"-
-# 6      supercooled - water 11.3748885 5.577411e-30 3.346447e-29 <-  -"-
-
-# "*" ...significant
+# "*" ...significant (p < 0.05)
 # "-" ...not significant
 
-#   Comparison                   Z          P.unadj       P.adj (Benjamini-Hochberg adjustmen)
-# 1        opaque_ice - overlap  -8.385532  5.049669e-17  6.312086e-17 *
-# 2   opaque_ice - overshooting -83.608021  0.000000e+00  0.000000e+00 *
-# 3      overlap - overshooting -70.014296  0.000000e+00  0.000000e+00 *
-# 4    opaque_ice - supercooled  47.453424  0.000000e+00  0.000000e+00 *
-# 5       overlap - supercooled  36.619214 1.414674e-293 2.357791e-293 *
-# 6  overshooting - supercooled 102.365663  0.000000e+00  0.000000e+00 *
-# 7          opaque_ice - water  -5.743477  9.275187e-09  1.030576e-08 *
-# 8             overlap - water  -1.992442  4.632259e-02  4.632259e-02 * (almost not)
-# 9        overshooting - water  43.268998  0.000000e+00  0.000000e+00 *
-# 10        supercooled - water -17.528444  8.691519e-69  1.241646e-68 *
+# Comparison                    Z           P.unadj         P.adj (Benjamini-Hochberg adjustmen)
+# 1        opaque_ice - overlap -10.074210  7.183602e-24*   8.979502e-24*
+# 2   opaque_ice - overshooting -90.002895  0.000000e+00*   0.000000e+00*
+# 3      overlap - overshooting -73.235940  0.000000e+00*   0.000000e+00*
+# 4    opaque_ice - supercooled  59.921179  0.000000e+00*   0.000000e+00*
+# 5       overlap - supercooled  45.849779  0.000000e+00*   0.000000e+00*
+# 6  overshooting - supercooled 115.393355  0.000000e+00*   0.000000e+00*
+# 7          opaque_ice - water  -2.727781  6.376188e-03*   6.376188e-03*
+# 8             overlap - water   2.832548  4.617865e-03*   5.130961e-03*
+# 9        overshooting - water  58.184094  0.000000e+00*   0.000000e+00*
+# 10        supercooled - water -22.786737  6.207148e-115*  8.867354e-115*
+
+#-> significance:
+# 
 
 print("overlap")
 summary(df$precipitation[df$cloudType == "overlap"])
