@@ -5,7 +5,7 @@
 #- cluster analysis should be performed on single scenes and the propagation of the 
 #identified cloud clusters should be monitored
 #a) the cloud clusters are building on each other -> the scenes could be analyzed together
-#b) the do not build on each other -> each scene should be analyzed on their own
+#b) they do not build on each other -> each scene should be analyzed by its own
 #ws...weather situation
 
 workingDir <- "C:/Users/tamta/Documents/Studium/02_Master/17_Masterarbeit/03_Data/"

@@ -132,4 +132,3 @@ ggplot(temperature, aes(x=temp, y = position, group = class)) +
   geom_boxplot(fatten = NULL, position = "identity", fill = "slateblue", color = NA, alpha = 0.3)+
   theme_light()
 
-             

@@ -78,8 +78,8 @@ for(j in 1:length(list)){
 
 #3.1 choose the month
 #--------------------
-month = "07"
-#month = "12"
+#month = "07"
+month = "12"
 
 #3.2 load the cluster groups
 #---------------------------
@@ -147,6 +147,30 @@ dunnResult
 # 9   grey - yellow -24.4795210 2.441145e-132 6.102862e-132
 # 10   red - yellow   5.5025136  3.744144e-08  7.488288e-08
 
+if(month == "07"){
+  #red -> ochre
+  #green -> yellow
+  #blue -> grey
+  #yellow -> darkblue
+  #grey -> lightblue
+  print("ochre (red)")
+  summary(df_grps$precip[df_grps$group == "red"])
+  print("yellow (green)")
+  summary(df_grps$precip[df_grps$group == "green"])
+  print("grey (blue)")
+  summary(df_grps$precip[df_grps$group == "blue"])
+  print("darkblue (yellow)")
+  summary(df_grps$precip[df_grps$group == "yellow"])
+  print("lightblue (grey)")
+  summary(df_grps$precip[df_grps$group == "grey"])
+}
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+# 0.1000  0.1000  0.2000  0.2269  0.3000  5.3000 ochre
+# 0.1000  0.1000  0.2000  0.2317  0.3000  5.8000 yellow
+# 0.1000  0.1000  0.2000  0.2367  0.3000  5.9000 grey
+# 0.1000  0.1000  0.1000  0.2286  0.3000  6.8000 darkblue
+# 0.1000  0.1000  0.1000  0.2148  0.2000  6.6000 lightblue
+
 #DEZ
 # Comparison          Z       P.unadj         P.adj
 # 1    blue - green  24.949736 2.149515e-137 2.149515e-136
@@ -159,6 +183,31 @@ dunnResult
 # 8  green - yellow -23.785842 4.680229e-125 2.340114e-124
 # 9   grey - yellow  -8.558776  1.140718e-17  1.901196e-17
 # 10   red - yellow  -4.626044  3.727156e-06  4.658945e-06
+
+if(month == "12"){
+  #red (orange) -> darkblue
+  #blue -> lightblue
+  #green -> yellow
+  #grey -> ochre
+  #yellow (turquoise) -> grey
+  print("darkblue (red/orange)")
+  summary(df_grps$precip[df_grps$group == "red"])
+  print("yellow (green)")
+  summary(df_grps$precip[df_grps$group == "green"])
+  print("lightblue (blue)")
+  summary(df_grps$precip[df_grps$group == "blue"])
+  print("grey (yellow/turquoise)")
+  summary(df_grps$precip[df_grps$group == "yellow"])
+  print("ochre (grey)")
+  summary(df_grps$precip[df_grps$group == "grey"])
+}
+
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+# 0.1000  0.1000  0.1000  0.1392  0.2000  1.0000 darkblue
+# 0.1000  0.1000  0.1000  0.1262  0.1000  1.1000 yellow
+# 0.1000  0.1000  0.1000  0.1461  0.2000  1.0000 lightblue
+# 0.1000  0.1000  0.1000  0.1447  0.2000  0.9000 grey
+# 0.1000  0.1000  0.1000  0.1383  0.1000  1.1000 ochre
 
 write.csv(dunnResult$res, paste0(workingDir, "07_Ergebnisse/DunnResult_clusterAnalysis_perNewGroup_Dez.csv"), row.names = F)
 #write.csv(dunnResult$res, paste0(workingDir, "07_Ergebnisse/DunnResult_clusterAnalysis_perNewGroup_Jul.csv"), row.names = F)
