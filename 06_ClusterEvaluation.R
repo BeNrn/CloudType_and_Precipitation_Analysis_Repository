@@ -6,6 +6,8 @@ dataDir <- paste0(workingDir, "03_Data/ClusterAnalysis/")
 library(FSA)
 library(stringr)
 library(magrittr)
+library(forcats)
+library(stringr)
 
 #-------------------------------------------------------------------------------
 #1 LOAD THE DATA
@@ -69,7 +71,7 @@ for(j in 1:length(list)){
 }
 
 #-------------------------------------------------------------------------------
-#3 EVALUATION OF THE RESULTS "REGRESSION"
+#3 EVALUATION OF THE MEAN VALUES
 #-------------------------------------------------------------------------------
 #the cluster groups building on each other presented in the continuing time 
 # series
@@ -92,6 +94,7 @@ list <- list[str_sub(list, 24,25) == month]
 
 #if there is an old df in memory
 rm(df_grps)
+
 for(j in 1:length(clusGroup)){
   #empty precipitation data vector
   precip_clusGrp <- c()
@@ -113,57 +116,77 @@ for(j in 1:length(clusGroup)){
 
 df_grps$group <- as.factor(df_grps$group)
 
-#3.4 Statistical evaluation
-#--------------------------
-#ANOVA VERFAHREN -> t-Test -> kann für diese Daten nicht angewendet werden
-#The idea is to measure the proportion of the variance (of the variable) 
-#explained by the group membership
-# -> explained variance by the variable = between cluster variance + within cluster variance
 
-#within cluster variance
-# sum(var(df_grps$precip[df_grps$group == "red"]),
-#     var(df_grps$precip[df_grps$group == "green"]),
-#     var(df_grps$precip[df_grps$group == "blue"]),
-#     var(df_grps$precip[df_grps$group == "yellow"]),
-#     var(df_grps$precip[df_grps$group == "grey"]))
-#between cluster variance
-
-
-kruskal.test(precip ~ group, data = df_grps)
-
-dunnResult <- FSA::dunnTest(precip ~ group, data = df_grps, method = "bh")
-dunnResult
-
-#JUL
-# Comparison           Z       P.unadj         P.adj
-# 1    blue - green   0.6015328  5.474852e-01  6.843565e-01
-# 2     blue - grey  28.2493906 1.448089e-175 7.240446e-175
-# 3    green - grey  26.7596119 9.544379e-158 3.181460e-157
-# 4      blue - red   0.3933848  6.940353e-01  7.711504e-01
-# 5     green - red  -0.2935336  7.691143e-01  7.691143e-01
-# 6      grey - red -30.7060254 4.729441e-207 4.729441e-206
-# 7   blue - yellow   5.2181852  1.806847e-07  3.011412e-07
-# 8  green - yellow   4.3746169  1.216459e-05  1.737799e-05
-# 9   grey - yellow -24.4795210 2.441145e-132 6.102862e-132
-# 10   red - yellow   5.5025136  3.744144e-08  7.488288e-08
-
+#rename the colors to new color palette
 if(month == "07"){
   #red -> ochre
   #green -> yellow
   #blue -> grey
   #yellow -> darkblue
   #grey -> lightblue
-  print("ochre (red)")
-  summary(df_grps$precip[df_grps$group == "red"])
-  print("yellow (green)")
-  summary(df_grps$precip[df_grps$group == "green"])
-  print("grey (blue)")
-  summary(df_grps$precip[df_grps$group == "blue"])
-  print("darkblue (yellow)")
-  summary(df_grps$precip[df_grps$group == "yellow"])
-  print("lightblue (grey)")
-  summary(df_grps$precip[df_grps$group == "grey"])
+  
+  #following the pattern: new = old
+  df_grps <- dplyr::mutate(df_grps, group = fct_recode(df_grps$group,"ochre" = "red", "yellow" = "green", "grey" = "blue", "darkblue" = "yellow", "lightblue" = "grey"))
+}else if(month == "12"){
+  #red (orange) -> darkblue
+  #blue -> lightblue
+  #green -> yellow
+  #grey -> ochre
+  #yellow (turquoise) -> grey
+  
+  df_grps <- dplyr::mutate(df_grps, group = fct_recode(df_grps$group,"darkblue" = "red", "lightblue" = "blue", "yellow" = "green", "ochre" = "grey", "grey" = "yellow"))
 }
+
+#3.4 Statistical evaluation
+#--------------------------
+#3.4.1 plot
+#----------
+if(month == "07"){
+  monthName <- "Juli"
+}else if(month == "12"){
+  monthName <- "Dezember"
+}
+
+plot(df_grps$group, df_grps$precip,
+     xlab = "Cluster-Klassen",
+     ylab = "Niederschlag in mm",
+     main = paste0("Niederschlagswerte in den einzelnen Wolkenklassen\n",monthName),
+     outline = F)
+
+#3.4.2 Mean analysis
+#--------------------
+#kruskal wallis test, if significance p < 0.05 -> significant differences
+kruskal.test(precip ~ group, data = df_grps)
+
+#dunns test if kw-test is significant
+dunnResult <- FSA::dunnTest(precip ~ group, data = df_grps, method = "bh")
+dunnResult
+
+#3.4.2.1 Results July
+#---------------------
+#              Comparison           Z       P.unadj         P.adj
+# 1       darkblue - grey  -5.2181852  1.806847e-07  3.011412e-07
+# 2  darkblue - lightblue  24.4795210 2.441145e-132 6.102862e-132
+# 3      grey - lightblue  28.2493906 1.448089e-175 7.240446e-175
+# 4      darkblue - ochre  -5.5025136  3.744144e-08  7.488288e-08
+# 5          grey - ochre   0.3933848  6.940353e-01  7.711504e-01
+# 6     lightblue - ochre -30.7060254 4.729441e-207 4.729441e-206
+# 7     darkblue - yellow  -4.3746169  1.216459e-05  1.737799e-05
+# 8         grey - yellow   0.6015328  5.474852e-01  6.843565e-01
+# 9    lightblue - yellow -26.7596119 9.544379e-158 3.181460e-157
+# 10       ochre - yellow   0.2935336  7.691143e-01  7.691143e-01
+
+print("ochre")
+summary(df_grps$precip[df_grps$group == "ochre"])
+print("yellow")
+summary(df_grps$precip[df_grps$group == "yellow"])
+print("grey")
+summary(df_grps$precip[df_grps$group == "grey"])
+print("darkblue")
+summary(df_grps$precip[df_grps$group == "darkblue"])
+print("lightblue")
+summary(df_grps$precip[df_grps$group == "lightblue"])
+
 # Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 # 0.1000  0.1000  0.2000  0.2269  0.3000  5.3000 ochre
 # 0.1000  0.1000  0.2000  0.2317  0.3000  5.8000 yellow
@@ -171,46 +194,43 @@ if(month == "07"){
 # 0.1000  0.1000  0.1000  0.2286  0.3000  6.8000 darkblue
 # 0.1000  0.1000  0.1000  0.2148  0.2000  6.6000 lightblue
 
-#DEZ
-# Comparison          Z       P.unadj         P.adj
-# 1    blue - green  24.949736 2.149515e-137 2.149515e-136
-# 2     blue - grey  10.861360  1.761069e-27  3.522139e-27
-# 3    green - grey -13.100029  3.291319e-39  8.228297e-39
-# 4      blue - red   7.024731  2.144791e-12  3.063987e-12
-# 5     green - red -14.924410  2.286479e-50  7.621595e-50
-# 6      grey - red  -2.834580  4.588595e-03  4.588595e-03
-# 7   blue - yellow   3.304727  9.506899e-04  1.056322e-03
-# 8  green - yellow -23.785842 4.680229e-125 2.340114e-124
-# 9   grey - yellow  -8.558776  1.140718e-17  1.901196e-17
-# 10   red - yellow  -4.626044  3.727156e-06  4.658945e-06
+#3.4.2.1 Results December
+#-------------------------
+#              Comparison         Z       P.unadj         P.adj
+# 1       darkblue - grey -4.626044  3.727156e-06  4.658945e-06
+# 2  darkblue - lightblue -7.024731  2.144791e-12  3.063987e-12
+# 3      grey - lightblue -3.304727  9.506899e-04  1.056322e-03
+# 4      darkblue - ochre  2.834580  4.588595e-03  4.588595e-03
+# 5          grey - ochre  8.558776  1.140718e-17  1.901196e-17
+# 6     lightblue - ochre 10.861360  1.761069e-27  3.522139e-27
+# 7     darkblue - yellow 14.924410  2.286479e-50  7.621595e-50
+# 8         grey - yellow 23.785842 4.680229e-125 2.340114e-124
+# 9    lightblue - yellow 24.949736 2.149515e-137 2.149515e-136
+# 10       ochre - yellow 13.100029  3.291319e-39  8.228297e-39
 
-if(month == "12"){
-  #red (orange) -> darkblue
-  #blue -> lightblue
-  #green -> yellow
-  #grey -> ochre
-  #yellow (turquoise) -> grey
-  print("darkblue (red/orange)")
-  summary(df_grps$precip[df_grps$group == "red"])
-  print("yellow (green)")
-  summary(df_grps$precip[df_grps$group == "green"])
-  print("lightblue (blue)")
-  summary(df_grps$precip[df_grps$group == "blue"])
-  print("grey (yellow/turquoise)")
-  summary(df_grps$precip[df_grps$group == "yellow"])
-  print("ochre (grey)")
-  summary(df_grps$precip[df_grps$group == "grey"])
-}
+print("ochre")
+summary(df_grps$precip[df_grps$group == "ochre"])
+print("yellow")
+summary(df_grps$precip[df_grps$group == "yellow"])
+print("grey")
+summary(df_grps$precip[df_grps$group == "grey"])
+print("darkblue")
+summary(df_grps$precip[df_grps$group == "darkblue"])
+print("lightblue")
+summary(df_grps$precip[df_grps$group == "lightblue"])
 
 # Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-# 0.1000  0.1000  0.1000  0.1392  0.2000  1.0000 darkblue
-# 0.1000  0.1000  0.1000  0.1262  0.1000  1.1000 yellow
-# 0.1000  0.1000  0.1000  0.1461  0.2000  1.0000 lightblue
-# 0.1000  0.1000  0.1000  0.1447  0.2000  0.9000 grey
 # 0.1000  0.1000  0.1000  0.1383  0.1000  1.1000 ochre
+# 0.1000  0.1000  0.1000  0.1262  0.1000  1.1000 yellow
+# 0.1000  0.1000  0.1000  0.1447  0.2000  0.9000 grey
+# 0.1000  0.1000  0.1000  0.1392  0.2000  1.0000 darkblue
+# 0.1000  0.1000  0.1000  0.1461  0.2000  1.0000 lightblue
 
-write.csv(dunnResult$res, paste0(workingDir, "07_Ergebnisse/DunnResult_clusterAnalysis_perNewGroup_Dez.csv"), row.names = F)
-#write.csv(dunnResult$res, paste0(workingDir, "07_Ergebnisse/DunnResult_clusterAnalysis_perNewGroup_Jul.csv"), row.names = F)
+#3.4.3 Save results
+#------------------
+write.csv(dunnResult$res, paste0(workingDir, "07_Ergebnisse/DunnResult_clusterAnalysis_perNewGroup_", str_sub(monthName, 1, 3), ".csv"), row.names = F)
+
+
 
 #other possibilities:
 #https://stats.stackexchange.com/questions/18706/using-statistical-significance-test-to-validate-cluster-analysis-results
@@ -226,62 +246,58 @@ write.csv(dunnResult$res, paste0(workingDir, "07_Ergebnisse/DunnResult_clusterAn
 #boxplot daten abgreifen erlaubt kein späteres erstellen von Boxplots
 #stattdessen boxplots direkt aus daten generieren
 
-#########################
-#hier weiter
-########################
-
 #4.1 load the data like above
 #----------------------------
-month = "07"
-#month = "12"
-
-list <- list.files(paste0(dataDir, "DaySlicing_newGroups"))
-list <- list[str_sub(list, 24,25) == month]
-
-#4.2 prepare a df and predefinings
-#---------------------------------
-#predefinings 
-clusGroup <- c("red", "green", "blue", "yellow", "grey")
-channels <- c("IR_039", "IR_087", "IR_097", "IR_108", "IR_120", "IR_134", "WV_062", "WV_073")
-
-#three layers are necessary:
-# - month, regulated by datetime
-# - clustergroup, regulated by clustergroup name
-# - spectral channel, regulated by channel name
-rm(df_grps, df_temp, precip_clusGrp, precipVals)
-
-df_spec <- data.frame(datetime = NA, clusterGroup = NA, specChannel = NA, 
-                      bxpl_lowWhisk = NA, bxpl_lowHin = NA, bxpl_median = NA, bxpl_higWhisk = NA, bxpl_higHin = NA)
-
-#4.3 extract boxplot information 
-#--------------------------------
-#iterate over scenes
-for(i in 1:length(list)){
-  df_temp <- read.csv(paste0(dataDir, "DaySlicing_newGroups/", list[i]))
-  
-  #iterate over cluster elements
-  for(j in clusGroup){
-    df_clus_temp <- df_temp[df_temp$ClusterGroup_continuing == j,]
-    
-    #iterate over spectral channels
-    for(k in channels){
-      #information for df
-      datetime <- df_temp[1,1]
-      clusterGroup <- j
-      specChannel <- k
-      
-      dat <- boxplot.stats(df_clus_temp[,names(df_clus_temp) == k])[[1]]
-      if(is.na(df_spec[1,1])){
-        df_spec <- data.frame(datetime = datetime, clusterGroup = clusterGroup, specChannel = specChannel, 
-                              bxpl_lowWhisk = NA, bxpl_lowHin = NA, bxpl_median = NA, bxpl_higWhisk = NA, bxpl_higHin = NA)
-        df_spec[,4:8] <- dat
-      }else{
-        datrow <- c(datetime, clusterGroup, specChannel, dat)
-        df_spec <- rbind(df_spec, datrow)
-      }
-    }
-  }
-}
-
-#write.csv(df_spec, paste0(dataDir, "/SpectralBoxplots_Dez.csv"), row.names = F)
-write.csv(df_spec, paste0(dataDir, "/SpectralBoxplots_Jul.csv"), row.names = F)
+# month = "07"
+# #month = "12"
+# 
+# list <- list.files(paste0(dataDir, "DaySlicing_newGroups"))
+# list <- list[str_sub(list, 24,25) == month]
+# 
+# #4.2 prepare a df and predefinings
+# #---------------------------------
+# #predefinings 
+# clusGroup <- c("red", "green", "blue", "yellow", "grey")
+# channels <- c("IR_039", "IR_087", "IR_097", "IR_108", "IR_120", "IR_134", "WV_062", "WV_073")
+# 
+# #three layers are necessary:
+# # - month, regulated by datetime
+# # - clustergroup, regulated by clustergroup name
+# # - spectral channel, regulated by channel name
+# rm(df_grps, df_temp, precip_clusGrp, precipVals)
+# 
+# df_spec <- data.frame(datetime = NA, clusterGroup = NA, specChannel = NA, 
+#                       bxpl_lowWhisk = NA, bxpl_lowHin = NA, bxpl_median = NA, bxpl_higWhisk = NA, bxpl_higHin = NA)
+# 
+# #4.3 extract boxplot information 
+# #--------------------------------
+# #iterate over scenes
+# for(i in 1:length(list)){
+#   df_temp <- read.csv(paste0(dataDir, "DaySlicing_newGroups/", list[i]))
+#   
+#   #iterate over cluster elements
+#   for(j in clusGroup){
+#     df_clus_temp <- df_temp[df_temp$ClusterGroup_continuing == j,]
+#     
+#     #iterate over spectral channels
+#     for(k in channels){
+#       #information for df
+#       datetime <- df_temp[1,1]
+#       clusterGroup <- j
+#       specChannel <- k
+#       
+#       dat <- boxplot.stats(df_clus_temp[,names(df_clus_temp) == k])[[1]]
+#       if(is.na(df_spec[1,1])){
+#         df_spec <- data.frame(datetime = datetime, clusterGroup = clusterGroup, specChannel = specChannel, 
+#                               bxpl_lowWhisk = NA, bxpl_lowHin = NA, bxpl_median = NA, bxpl_higWhisk = NA, bxpl_higHin = NA)
+#         df_spec[,4:8] <- dat
+#       }else{
+#         datrow <- c(datetime, clusterGroup, specChannel, dat)
+#         df_spec <- rbind(df_spec, datrow)
+#       }
+#     }
+#   }
+# }
+# 
+# #write.csv(df_spec, paste0(dataDir, "/SpectralBoxplots_Dez.csv"), row.names = F)
+# write.csv(df_spec, paste0(dataDir, "/SpectralBoxplots_Jul.csv"), row.names = F)
