@@ -16,6 +16,7 @@ library(factoextra)
 library(rgdal)
 library(raster)
 library(tidyverse)
+library(cluster)
 #-------------------------------------------------------------------------------
 #1 LOAD THE DATA
 #-------------------------------------------------------------------------------
@@ -23,13 +24,18 @@ library(tidyverse)
 #July: on the 12.07.
 #December: on the 30.12.
 
-#load the December 
-fileList <- list.files(paste0(workingDir, "Intersection_CT_RD/"))
-jul <- fileList[13]
-dez <- fileList[45]
+#load one month 
+month = "07"
+#month = "12"
 
-df <- read.csv(paste0(workingDir, "Intersection_CT_RD/", dez))[,-1]
-df <- read.csv(paste0(workingDir, "Intersection_CT_RD/", jul))[,-1]
+fileList <- list.files(paste0(workingDir, "Intersection_CT_RD/"))
+if(month == "07"){
+  df_file <- fileList[str_sub(fileList, -8,-5) == "0712"]
+}else if(month == "12"){
+  df_file <- fileList[str_sub(fileList, -8,-5) == "1230"]
+}
+#load the df at the identified position
+df <- read.csv(paste0(workingDir, "Intersection_CT_RD/", df_file))[,-1]
 
 #round data to radolan accuracy of 1/10mm
 df$precipitation <- round(df$precipitation, digits = 1)
@@ -95,20 +101,19 @@ for(i in 1:length(df_list)){
                      df_out$acquisitionDate[1] %>% str_sub(12,13),
                      "_", 
                      df_out$acquisitionDate[1] %>% str_sub(15,16))
-  #write.csv(df_out, paste0(workingDir, "ClusterAnalysis/DaySlicing/Cluster_4_", timeStep, ".csv"), row.names = F)
-  write.csv(df_out, paste0(workingDir, "ClusterAnalysis/DaySlicing/Cluster_5_", timeStep, ".csv"), row.names = F)
+  
+  #write.csv(df_out, paste0(workingDir, "ClusterAnalysis/DaySlicing/Cluster_5_", timeStep, ".csv"), row.names = F)
   print(i)
 }
 
 #-------------------------------------------------------------------------------
 #4 LOAD DATA AGAIN AND WRITING TO TIFF
 #-------------------------------------------------------------------------------
-#only for dezember
+#only for chosen month and only 5-group-cluster
 list <- list.files(paste0(workingDir, "ClusterAnalysis/DaySlicing"))
 #list <- list[str_sub(list,11,20) == "2017-12-30"]
 list <- list[str_sub(list,11,20) == "2017-07-12"]
 
-#list <- list[str_sub(list, 9,9) == "4"]
 list <- list[str_sub(list, 9,9) == "5"]
 
 

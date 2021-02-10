@@ -8,6 +8,7 @@ library(stringr)
 library(magrittr)
 library(forcats)
 library(stringr)
+library(ggplot2)
 
 #-------------------------------------------------------------------------------
 #1 LOAD THE DATA
@@ -80,7 +81,7 @@ for(j in 1:length(list)){
 
 #3.1 choose the month
 #--------------------
-#month = "07"
+month = "07"
 month = "12"
 
 #3.2 load the cluster groups
@@ -147,11 +148,42 @@ if(month == "07"){
   monthName <- "Dezember"
 }
 
+#boxplots
 plot(df_grps$group, df_grps$precip,
      xlab = "Cluster-Klassen",
      ylab = "Niederschlag in mm",
      main = paste0("Niederschlagswerte in den einzelnen Wolkenklassen\n",monthName),
      outline = F)
+
+#violine plot
+if(month == "12"){
+  ggplot(df_grps, aes(x=group, y=precip, fill=group))+
+    #adjust corrects the distribution for the non-continuous precipitation data 
+    #in 1/10mm steps
+    geom_violin(adjust = 3)+
+    scale_fill_manual(values = c("#586CC3", "#EBEA76","#BAC090", "#0044A3", "#8A97AA"))+
+    stat_summary(fun=mean, geom="point", shape=3, size=5, color="red", fill="red")+
+    theme(legend.position = "none")+
+    scale_x_discrete(breaks = c("lightblue", "yellow", "ochre", "darkblue", "grey"),
+                     labels = c("Hellblau", "Gelb", "Ocker", "Dunkelblau", "Grau"))+
+    xlab("Clustergruppen")+
+    ylab("Niederschlag in mm")+
+    ggtitle(paste0("Niederschlagsverteilung in den Clustergruppen im ", monthName))
+}else if(month == "07"){
+  ggplot(df_grps, aes(x=group, y=precip, fill=group))+
+    #adjust corrects the distribution for the non-continuous precipitation data 
+    #in 1/10mm steps
+    geom_violin(adjust = 3)+
+    scale_fill_manual(values = c("#8A97AA", "#EBEA76","#586CC3", "#BAC090", "#0044A3"))+
+    stat_summary(fun=mean, geom="point", shape=3, size=5, color="red", fill="red")+
+    theme(legend.position = "none")+
+    scale_x_discrete(breaks = c("lightblue", "yellow", "ochre", "darkblue", "grey"),
+                     labels = c("Hellblau", "Gelb", "Ocker", "Dunkelblau", "Grau"))+
+    #ylim(0,2)+
+    xlab("Clustergruppen")+
+    ylab("Niederschlag in mm")+
+    ggtitle(paste0("Niederschlagsverteilung in den Clustergruppen im ", monthName))
+}
 
 #3.4.2 Mean analysis
 #--------------------
