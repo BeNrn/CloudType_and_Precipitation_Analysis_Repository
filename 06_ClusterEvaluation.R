@@ -27,9 +27,9 @@ list <- list[str_sub(list, 9,9) == "5"]
 for(j in 1:length(list)){
   df <- read.csv(paste0(dataDir, "DaySlicing/", list[j]))
   
-  #-------------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
   #2 ASSIGN CONTINUING CLUSTER GROUP
-  #-------------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
   #add a column and copy the cluster values
   df$ClusterGroup_continuing <- df$ClusterGroup
   #transform new column to string
@@ -81,7 +81,7 @@ for(j in 1:length(list)){
 
 #3.1 choose the month
 #--------------------
-month = "07"
+#month = "07"
 month = "12"
 
 #3.2 load the cluster groups
@@ -160,7 +160,7 @@ if(month == "12"){
   ggplot(df_grps, aes(x=group, y=precip, fill=group))+
     #adjust corrects the distribution for the non-continuous precipitation data 
     #in 1/10mm steps
-    geom_violin(adjust = 3)+
+    geom_violin(adjust = 1)+
     scale_fill_manual(values = c("#586CC3", "#EBEA76","#BAC090", "#0044A3", "#8A97AA"))+
     stat_summary(fun=mean, geom="point", shape=3, size=5, color="red", fill="red")+
     theme(legend.position = "none")+
@@ -173,7 +173,7 @@ if(month == "12"){
   ggplot(df_grps, aes(x=group, y=precip, fill=group))+
     #adjust corrects the distribution for the non-continuous precipitation data 
     #in 1/10mm steps
-    geom_violin(adjust = 3)+
+    geom_violin(adjust = 1)+
     scale_fill_manual(values = c("#8A97AA", "#EBEA76","#586CC3", "#BAC090", "#0044A3"))+
     stat_summary(fun=mean, geom="point", shape=3, size=5, color="red", fill="red")+
     theme(legend.position = "none")+
@@ -196,17 +196,17 @@ dunnResult
 
 #3.4.2.1 Results July
 #---------------------
-#              Comparison           Z       P.unadj         P.adj
-# 1       darkblue - grey  -5.2181852  1.806847e-07  3.011412e-07
-# 2  darkblue - lightblue  24.4795210 2.441145e-132 6.102862e-132
-# 3      grey - lightblue  28.2493906 1.448089e-175 7.240446e-175
-# 4      darkblue - ochre  -5.5025136  3.744144e-08  7.488288e-08
-# 5          grey - ochre   0.3933848  6.940353e-01  7.711504e-01
-# 6     lightblue - ochre -30.7060254 4.729441e-207 4.729441e-206
-# 7     darkblue - yellow  -4.3746169  1.216459e-05  1.737799e-05
-# 8         grey - yellow   0.6015328  5.474852e-01  6.843565e-01
-# 9    lightblue - yellow -26.7596119 9.544379e-158 3.181460e-157
-# 10       ochre - yellow   0.2935336  7.691143e-01  7.691143e-01
+#   Comparison            Z           P.unadj      P.adj
+# 1       darkblue - grey -0.28956124 7.721519e-01 9.651899e-01
+# 2  darkblue - lightblue -0.07096725 9.434238e-01 9.434238e-01
+# 3      grey - lightblue  0.21139451 8.325794e-01 9.250883e-01
+# 4      darkblue - ochre -2.94255980 3.255109e-03 6.510218e-03
+# 5          grey - ochre -2.62664504 8.623123e-03 1.231875e-02
+# 6     lightblue - ochre -2.79169363 5.243298e-03 8.738829e-03
+# 7     darkblue - yellow  8.41898466 3.797611e-17 1.265870e-16
+# 8         grey - yellow  8.62421581 6.453332e-18 3.226666e-17
+# 9    lightblue - yellow  8.26645577 1.380002e-16 3.450006e-16
+# 10       ochre - yellow 11.24298862 2.507471e-29 2.507471e-28
 
 print("ochre")
 summary(df_grps$precip[df_grps$group == "ochre"])
@@ -219,26 +219,27 @@ summary(df_grps$precip[df_grps$group == "darkblue"])
 print("lightblue")
 summary(df_grps$precip[df_grps$group == "lightblue"])
 
-# Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-# 0.1000  0.1000  0.2000  0.2269  0.3000  5.3000 ochre
-# 0.1000  0.1000  0.2000  0.2317  0.3000  5.8000 yellow
-# 0.1000  0.1000  0.2000  0.2367  0.3000  5.9000 grey
-# 0.1000  0.1000  0.1000  0.2286  0.3000  6.8000 darkblue
-# 0.1000  0.1000  0.1000  0.2148  0.2000  6.6000 lightblue
+
+# Min.   1st Qu. Median  Mean    3rd Qu. Max. 
+#0.01000 0.03678 0.08795 0.15652 0.20058 6.84922 ochre
+#0.01000 0.03360 0.08117 0.15516 0.19488 5.37895 yellow
+#0.01000 0.03635 0.08645 0.15285 0.19740 5.91566 grey
+#0.01000 0.03633 0.08604 0.15498 0.19765 5.28729 darkblue
+#0.01000 0.03518 0.08632 0.15867 0.20313 6.62324 lightblue
 
 #3.4.2.1 Results December
 #-------------------------
-#              Comparison         Z       P.unadj         P.adj
-# 1       darkblue - grey -4.626044  3.727156e-06  4.658945e-06
-# 2  darkblue - lightblue -7.024731  2.144791e-12  3.063987e-12
-# 3      grey - lightblue -3.304727  9.506899e-04  1.056322e-03
-# 4      darkblue - ochre  2.834580  4.588595e-03  4.588595e-03
-# 5          grey - ochre  8.558776  1.140718e-17  1.901196e-17
-# 6     lightblue - ochre 10.861360  1.761069e-27  3.522139e-27
-# 7     darkblue - yellow 14.924410  2.286479e-50  7.621595e-50
-# 8         grey - yellow 23.785842 4.680229e-125 2.340114e-124
-# 9    lightblue - yellow 24.949736 2.149515e-137 2.149515e-136
-# 10       ochre - yellow 13.100029  3.291319e-39  8.228297e-39
+#   Comparison             Z          P.unadj       P.adj
+# 1       darkblue - grey -35.9343579 8.884280e-283 2.221070e-282
+# 2  darkblue - lightblue -19.1737395  6.133707e-82  1.022285e-81
+# 3      grey - lightblue  16.8661981  7.976811e-64  9.971014e-64
+# 4      darkblue - ochre  16.5446258  1.750490e-61  1.944989e-61
+# 5          grey - ochre  59.4865667  0.000000e+00  0.000000e+00
+# 6     lightblue - ochre  38.9761051  0.000000e+00  0.000000e+00
+# 7     darkblue - yellow  -0.2502198  8.024174e-01  8.024174e-01
+# 8         grey - yellow  39.6792192  0.000000e+00  0.000000e+00
+# 9    lightblue - yellow  20.7566772  1.066938e-95  2.133876e-95
+# 10       ochre - yellow -18.4875135  2.602824e-76  3.718320e-76
 
 print("ochre")
 summary(df_grps$precip[df_grps$group == "ochre"])
@@ -252,11 +253,11 @@ print("lightblue")
 summary(df_grps$precip[df_grps$group == "lightblue"])
 
 # Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-# 0.1000  0.1000  0.1000  0.1383  0.1000  1.1000 ochre
-# 0.1000  0.1000  0.1000  0.1262  0.1000  1.1000 yellow
-# 0.1000  0.1000  0.1000  0.1447  0.2000  0.9000 grey
-# 0.1000  0.1000  0.1000  0.1392  0.2000  1.0000 darkblue
-# 0.1000  0.1000  0.1000  0.1461  0.2000  1.0000 lightblue
+# 0.01000 0.02086 0.04148 0.06767 0.08363 1.10616 ochre
+# 0.01000 0.02717 0.05034 0.06947 0.08794 1.09407 yellow
+# 0.01000 0.03344 0.06810 0.09533 0.12454 0.92635 grey
+# 0.01000 0.02341 0.04890 0.07597 0.10045 0.99557 darkblue
+# 0.01000 0.02877 0.05839 0.08693 0.11420 1.05766 lightblue
 
 #3.4.3 Save results
 #------------------

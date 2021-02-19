@@ -17,10 +17,11 @@ for(files in fileList){
         print(files)
         df <- read.csv(paste0(file_base, "Intersection_CT_RD/", files))[,-1]
         #round data to radolan accuracy of 1/10mm
-        df$precipitation <- round(df$precipitation, digits = 1)
+        #df$precipitation <- round(df$precipitation, digits = 1)
         #remove zeros (zero precipitation is set to NA by python)
         df <- df[!is.na(df$precipitation),]
-        df <- df[df$precipitation != 0,]
+        #df <- df[df$precipitation != 0,]
+        df <- df[df$precipitation > 0.01,]
         
         #remove cloudtypes that aren't interesting for precipitation study
         df <- df[!is.na(df$cloudType),] #NA
@@ -73,13 +74,13 @@ ape::Moran.I(df_sample$precipitation, distance)
 #Nullhypothese kann abgelehnt werden -> räumliche Clusterung
 
 # $observed
-# [1] 0.02580478
+# [1] 0.01755382
 # 
 # $expected
 # [1] -0.00010001
 # 
 # $sd
-# [1] 0.0002310415
+# [1] 0.0002191169
 # 
 # $p.value
 # [1] 0
@@ -106,7 +107,7 @@ hist(df$precipitation)
 boxplot(precipitation~cloudType, data = df, outline = T,
         xlab = "Cloud Type", ylab = "Precipitation", main = "Precipitation distribution over the cloud types")
 
-#R-Squared: 4,6% (as the Adjusted R² is based on 1 = 100%)
+#R-Squared: 5,9% (as the Adjusted R² is based on 1 = 100%)
 
 
 #TRANSFORM THE DATA TO NORMAL DISTRIBUTION
@@ -119,7 +120,7 @@ df$transformedVal <- df$precipitation^BoxCoxTrans(df$precipitation)$lambda
 m_trans <- lm(transformedVal~cloudType, data = df)
 summary(m_trans)
 
-#R-Squared: 3,0%
+#R-Squared: 5,3%
 rm(m, m_trans)
 
 #-------------------------------------------------------------------------------
@@ -132,7 +133,7 @@ rm(m, m_trans)
 gamMod <- gam(precipitation ~ cloudType, data = df, family = gaussian())
 summary(gamMod)
 #--------------------------
-#explained deviance: 4,63%
+#explained deviance: 5,87%
 #---------------------------
 
 #BIG GAM WITH LAT LON FOR CORRECTION OF AUTOCORRELATION AS REGIONAL SPLINES---
@@ -156,8 +157,8 @@ gamMod <- bam(precipitation ~ cloudType + te(lat, lon, k = 15), data = df, famil
 summary(gamMod)
 
 #--------------------------
-#explained deviance: 4,63% (BAM)
-#explained deviance: 5,32% (BAM WITH LAT,LON, k = NULL, Gaussian Dist.)
+#explained deviance: 5,87% (BAM)
+#explained deviance: 6.66% (BAM WITH LAT,LON, k = NULL, Gaussian Dist.)
 #explained deviance: 5,75% (BAM WITH LAT,LON, k = 10,   Gaussian Dist.)
 #explained deviance: 6,01% (BAM WITH LAT,LON, k = 15,   Gaussian Dist.)
 #explained deviance: 11,1% (BAM WITH LAT,LON, k = NULL, Gamma Dist.)
@@ -204,20 +205,21 @@ dunnResult
 # "*" ...significant (p < 0.05)
 # "-" ...not significant
 
-# Comparison                    Z           P.unadj         P.adj (Benjamini-Hochberg adjustmen)
-# 1        opaque_ice - overlap -10.074210  7.183602e-24*   8.979502e-24*
-# 2   opaque_ice - overshooting -90.002895  0.000000e+00*   0.000000e+00*
-# 3      overlap - overshooting -73.235940  0.000000e+00*   0.000000e+00*
-# 4    opaque_ice - supercooled  59.921179  0.000000e+00*   0.000000e+00*
-# 5       overlap - supercooled  45.849779  0.000000e+00*   0.000000e+00*
-# 6  overshooting - supercooled 115.393355  0.000000e+00*   0.000000e+00*
-# 7          opaque_ice - water  -2.727781  6.376188e-03*   6.376188e-03*
-# 8             overlap - water   2.832548  4.617865e-03*   5.130961e-03*
-# 9        overshooting - water  58.184094  0.000000e+00*   0.000000e+00*
-# 10        supercooled - water -22.786737  6.207148e-115*  8.867354e-115*
+#Dez:full
+#Jul: 1.-18.
+# Comparison                     Z         P.unadj       P.adj(Benjamini-Hochberg adjustmen)
+# 1        opaque_ice - overlap   6.33847  2.320575e-10  2.578417e-10*
+# 2   opaque_ice - overshooting -62.72412  0.000000e+00  0.000000e+00*
+# 3      overlap - overshooting -59.66729  0.000000e+00  0.000000e+00*
+# 4    opaque_ice - supercooled 111.12614  0.000000e+00  0.000000e+00*
+# 5       overlap - supercooled  58.25013  0.000000e+00  0.000000e+00*
+# 6  overshooting - supercooled 105.36888  0.000000e+00  0.000000e+00*
+# 7          opaque_ice - water  44.38794  0.000000e+00  0.000000e+00*
+# 8             overlap - water  35.76559 3.787188e-280 4.733985e-280*
+# 9        overshooting - water  79.37209  0.000000e+00  0.000000e+00*
+# 10        supercooled - water   3.49727  4.700456e-04  4.700456e-04*
 
-#-> significance:
-# 
+#*... significant
 
 print("overlap")
 summary(df$precipitation[df$cloudType == "overlap"])

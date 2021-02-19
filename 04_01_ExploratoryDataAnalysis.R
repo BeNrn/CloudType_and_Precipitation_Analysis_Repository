@@ -18,10 +18,12 @@ for(files in fileList){
   print(files)
   df <- read.csv(paste0(workingDir, "Intersection_CT_RD/", files))[,-1]
   #round data to radolan accuracy of 1/10mm
-  df$precipitation <- round(df$precipitation, digits = 1)
+  #df$precipitation <- round(df$precipitation, digits = 1)
+  
   #remove zeros (zero precipitation is set to NA by python)
   df <- df[!is.na(df$precipitation),]
-  df <- df[df$precipitation != 0,]
+  #df <- df[df$precipitation != 0,]
+  df <- df[df$precipitation > 0.01,]
   
   #remove cloudtypes that aren't interesting for precipitation study
   df <- df[!is.na(df$cloudType),] #NA
@@ -90,7 +92,7 @@ for(i in seq(1:length(unique(df$cloudType)))){
   hist(df$precipitation[df$cloudType == ct_name],
        xlim = c(0,1), 
        main = title_name,
-       breaks = c(seq(0.1,10,0.1)),
+       breaks = c(seq(0,10,0.1)),
        labels = T,
        col = "lightblue")
   #boxplot
