@@ -22,6 +22,7 @@ lookUpTable <- lookUpTable[lookUpTable$Datum != "",]
 #list of day slices
 list <- list.files(paste0(dataDir, "DaySlicing"))
 list <- list[endsWith(list, ".csv")]
+#filter for 5 clustering groups
 list <- list[str_sub(list, 9,9) == "5"]
 
 for(j in 1:length(list)){
@@ -158,8 +159,6 @@ plot(df_grps$group, df_grps$precip,
 #violine plot
 if(month == "12"){
   ggplot(df_grps, aes(x=group, y=precip, fill=group))+
-    #adjust corrects the distribution for the non-continuous precipitation data 
-    #in 1/10mm steps
     geom_violin(adjust = 1)+
     scale_fill_manual(values = c("#586CC3", "#EBEA76","#BAC090", "#0044A3", "#8A97AA"))+
     stat_summary(fun=mean, geom="point", shape=3, size=5, color="red", fill="red")+
@@ -171,8 +170,6 @@ if(month == "12"){
     ggtitle(paste0("Niederschlagsverteilung in den Clustergruppen im ", monthName))
 }else if(month == "07"){
   ggplot(df_grps, aes(x=group, y=precip, fill=group))+
-    #adjust corrects the distribution for the non-continuous precipitation data 
-    #in 1/10mm steps
     geom_violin(adjust = 1)+
     scale_fill_manual(values = c("#8A97AA", "#EBEA76","#586CC3", "#BAC090", "#0044A3"))+
     stat_summary(fun=mean, geom="point", shape=3, size=5, color="red", fill="red")+
@@ -252,7 +249,7 @@ summary(df_grps$precip[df_grps$group == "darkblue"])
 print("lightblue")
 summary(df_grps$precip[df_grps$group == "lightblue"])
 
-# Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+# Min.    1st Qu. Median  Mean    3rd Qu. Max. 
 # 0.01000 0.02086 0.04148 0.06767 0.08363 1.10616 ochre
 # 0.01000 0.02717 0.05034 0.06947 0.08794 1.09407 yellow
 # 0.01000 0.03344 0.06810 0.09533 0.12454 0.92635 grey

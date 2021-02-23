@@ -9,6 +9,8 @@ import os
 from glob import glob
 
 #works only when the current working folder is "C:\Users\tamta\Documents\Studium\02_Master\17_Masterarbeit\CloudType_and_Precipitation_Analysis_Repository" 
+os.chdir("C:/Users/tamta/Documents/Studium/02_Master/17_Masterarbeit/CloudType_and_Precipitation_Analysis_Repository/")
+
 import FUN_ExtractWeatherSituation as ws
 #import matplotlib.pyplot as plt
 #------------------------------------------------------------------------------
@@ -32,25 +34,28 @@ msgList = os.listdir(workingDir + msgDir)
 #month = 12
 #july = "07"
 month = 7
-#ctList = [element for element in ctList if element[7:9] == "12"]
-ctList = [element for element in ctList if element[7:9] == "07"]
-#rdList = [element for element in rdList if element[12:14] == "12"]
-rdList = [element for element in rdList if element[12:14] == "07"]
-#msgList = [element for element in msgList if element[8:10] == "12"]
-msgList = [element for element in msgList if element[8:10] == "07"]
+if month == 7:
+    ctList = [element for element in ctList if element[7:9] == "07"]
+    rdList = [element for element in rdList if element[12:14] == "07"]
+    msgList = [element for element in msgList if element[8:10] == "07"]
+else:
+    ctList = [element for element in ctList if element[7:9] == "12"]
+    rdList = [element for element in rdList if element[12:14] == "12"]
+    msgList = [element for element in msgList if element[8:10] == "12"]
+
 
 #SPECIAL FOR PARTLY DATA INTERSECTION JULY 2017
 #----------------------------------------------
 #test for 01.07.2017
-#filter only 1. to 18.7.
-ctList = [element for element in ctList if int(element[9:11]) < 18]
-rdList = [element for element in rdList if int(element[14:16]) < 18]
-msgList = [element for element in msgList if int(element[10:12]) < 18]
+#filter only 1. to 20.7.
+# ctList = [element for element in ctList if int(element[9:11]) < 21]
+# rdList = [element for element in rdList if int(element[14:16]) < 21]
+# msgList = [element for element in msgList if int(element[10:12]) < 21]
 
 #filter only 18.07.
-# ctList = [element for element in ctList if element[9:11] == "18"]
-# rdList = [element for element in rdList if element[14:16] == "18"]
-# msgList = [element for element in msgList if element[10:12] == "18"]
+ctList = [element for element in ctList if element[9:11] == "20"]
+rdList = [element for element in rdList if element[14:16] == "20"]
+msgList = [element for element in msgList if element[10:12] == "20"]
 
 #------------------------------------------------------------------------------
 # 3 DATA INTERSECTION
