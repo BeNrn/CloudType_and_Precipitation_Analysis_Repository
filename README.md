@@ -1,10 +1,10 @@
 # Cloud Type and Precipitation Analysis
   *Master's Thesis Repository*
   
-  The repository presents scripts that were used to extract cloud type, precipitation and cloud properties data. In subsequent steps, those information were intersected and analysed to identify possible interdependencies between cloud type and precipitation. This is done by first separating the precipitation by predefined cloud types. Second, a new unsupervised cloud type classification is performed, again, to separate the precipitation values. Analyzing the precipitation values within the defined classes allows to draw conclusions about the cloud type - precipitation relationship.  
+  The repository presents scripts that are used to extract cloud type, precipitation and cloud properties data. In subsequent steps, those information are intersected and analysed to identify possible interdependencies between cloud type and precipitation. This is done by first separating the precipitation by predefined cloud types. Second, a new unsupervised cloud type classification is performed, again, to separate the precipitation values. Analyzing the precipitation values within the defined classes allows to draw conclusions about the cloud type - precipitation relationship.  
 
 ## 1 Data
-  The date used in the study is:
+  The date used in the study are:
 - The **cloud type** (CT-product) from the CPP-product of the EUMETSAT CM-SAF
 - The **spectral information** data of the EUMETSAT
 - The RADOLAN **precipitation** data of the Deutscher Wetterdienst (DWD)
@@ -14,14 +14,22 @@
   The original data, except for the weather situation classification is converted into the .tif format, retransformed into the same coordinate reference system (CRS) and reprojected to the same spatial and temporal resolution.
 
 ## 3 Intersection
-  Subsequently, a spatial and temporal intersection is performed resulting in a *cloud attribute dataset*. 
+  A spatial and temporal intersection is performed resulting in a *cloud attribute dataset*. 
 
-## 4 Mean value examination
-  To analyze the dependencies between a predefined cloud type product and precipitation values the precipitation distribution within the discrete ct-product classes are analyzed. A Kruskal-Wallis test returns significant differences (alpha = 0.05) in the mean precipitation values within the individual cloud types. The post-hoc Dunn's test confirms the findings between all cloud types pairwise.
+## 4 Interdependency predefined cloud type and precipitation
+  To analyze the dependencies between the predefined cloud type product (CT-product) and precipitation values, the precipitation distribution within the discrete CT-product classes are analyzed. A Kruskal-Wallis test returns significant differences (alpha = 0.05) in the mean precipitation values within the individual cloud types. The post-hoc Dunn's test confirms the findings between all cloud types pairwise.
 
 ## 5 Cluster analysis
   To optimize the class delineation regarding the precipitation behavior, a cluster analysis is performed. It includes the spectral information and the precipitation distribution.
 Delineable rain events can be identified as the waether situation is used. Additionally, the continuity in the cluster delineation is used to determine the possibility of cross-scene analysis.   
+
+## Sources
+- HEISTERMANN, M., JACOBI, S., & PFAFF, T. (2013). Technical Note: An open source library for processing weather radar data (wradlib). In Hydrology and Earth System Sciences (No.2; Hydrology and Earth System Sciences, Vol. 17, Number 2, pp. 863–871). Copernicus GmbH. 
+- HOYER, S., & HAMMAN, J. J. (2017). xarray: N-D labeled Arrays and Datasets in Python. Journal of Open Research Software, 5.
+- KASSAMBARA, A., & MUNDT, F. (2020). Package factoextra. Extract and Visualize the Results of Multivariate Data Analyse. Version 1.0.7.
+- OGLE, D. H., WHEELER, P., & DINNO, A. (2020). FSA: FISHERIES STOCK ANALYSIS. HTTPS://GITHUB.COM/DROGLENC/FSA
+- RASPAUD, M., HOESE, D., LAHTINEN, P., FINKENSIEPER, S., DYBBROE, A., HOLL, G., PROUD, S., JORO, S., ZHANG, X., MERANER, A., ROBERTS, W., RASMUSSEN, L. Ø., MÉNDEZ, J. H. B., JOLEENF, ZHU, Y., DARUWALA, R., JASMIN, T., BENR, BARNIE, T., SIGURÐSSON, E., R.K.GARCIA, LEPPELT, T., COLINDUFF, EGEDE, U., LTMEYER, ITKIN, M., GOODSON, R., RADAR, S., DIVISION, N., JKOTRO, & PETERS. (2020). pytroll/satpy: Version 0.23.0 (2020/09/18). Zenodo. 
+
 
 ## Data sources
 - EUMETSAT CM-SAF CPP product
