@@ -21,13 +21,13 @@
 
 ## 5 Cluster analysis
   To optimize the class delineation regarding the precipitation behavior, a cluster analysis is performed. It includes the spectral information and the precipitation distribution.
-Delineable rain events can be identified as the waether situation is used. Additionally, the continuity in the cluster delineation is used to determine the possibility of cross-scene analysis.   
+Delineable rain events can be identified as the waether situation is used. Additionally, the continuity in the cluster delineation is used to identify data for a cross-scene analysis.
 
 ## Sources
 - HEISTERMANN, M., JACOBI, S., & PFAFF, T. (2013). Technical Note: An open source library for processing weather radar data (wradlib). In Hydrology and Earth System Sciences (No.2; Hydrology and Earth System Sciences, Vol. 17, Number 2, pp. 863–871). Copernicus GmbH. 
 - HOYER, S., & HAMMAN, J. J. (2017). xarray: N-D labeled Arrays and Datasets in Python. Journal of Open Research Software, 5.
 - KASSAMBARA, A., & MUNDT, F. (2020). Package factoextra. Extract and Visualize the Results of Multivariate Data Analyse. Version 1.0.7.
-- OGLE, D. H., WHEELER, P., & DINNO, A. (2020). FSA: FISHERIES STOCK ANALYSIS. HTTPS://GITHUB.COM/DROGLENC/FSA
+- OGLE, D. H., WHEELER, P., & DINNO, A. (2020). FSA: Fisheries Stock Analysis. https://github.com/droglenc/FSA
 - RASPAUD, M., HOESE, D., LAHTINEN, P., FINKENSIEPER, S., DYBBROE, A., HOLL, G., PROUD, S., JORO, S., ZHANG, X., MERANER, A., ROBERTS, W., RASMUSSEN, L. Ø., MÉNDEZ, J. H. B., JOLEENF, ZHU, Y., DARUWALA, R., JASMIN, T., BENR, BARNIE, T., SIGURÐSSON, E., R.K.GARCIA, LEPPELT, T., COLINDUFF, EGEDE, U., LTMEYER, ITKIN, M., GOODSON, R., RADAR, S., DIVISION, N., JKOTRO, & PETERS. (2020). pytroll/satpy: Version 0.23.0 (2020/09/18). Zenodo. 
 
 
