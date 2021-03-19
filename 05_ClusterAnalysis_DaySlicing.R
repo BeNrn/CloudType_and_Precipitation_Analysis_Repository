@@ -75,11 +75,23 @@ for(i in 1:length(df_list)){
   set.seed(123)
   #4.6.1 ellbow method
   #factoextra::fviz_nbclust(smp, kmeans, method = "wss")
-  #3,4,5
-
+  
+  #for plotting
+  #a <- factoextra::fviz_nbclust(smp, kmeans, method = "wss", print.summary = TRUE)
+  #jpeg(file = paste0("C:/Users/tamta/Documents/Studium/02_Master/17_Masterarbeit/03_Data/Test/", as.character(i), ".jpg"))
+  #plot(a)
+  #dev.off()
+  #2,3,4,5
+  
   #4.6.2 silhouette method
   #factoextra::fviz_nbclust(smp, kmeans, method = "silhouette")
-  #2, 4
+  
+  #for plotting
+  #a <- factoextra::fviz_nbclust(smp, kmeans, method = "silhouette")
+  #jpeg(file = paste0("C:/Users/tamta/Documents/Studium/02_Master/17_Masterarbeit/03_Data/Test/", as.character(i), ".jpg"))
+  #plot(a)
+  #dev.off()
+  #2,3,4,5
 
   #4.6.3 gap method
   #gap_stat <- clusGap(smp, FUN = kmeans, nstart = 25,
@@ -89,21 +101,21 @@ for(i in 1:length(df_list)){
   #4,5,7
   
   #final cluster analysis
-  cluster <- kmeans(smp, center = 5, nstart = 25)
+  #cluster <- kmeans(smp, center = 5, nstart = 25)
   #cluster <- kmeans(smp, center = 4, nstart = 25)
   #save to disk
   
   #smp %>% mutate(ClusterGroup = cluster$cluster) %>% group_by(ClusterGroup) %>% summarise_all("mean")
   
-  df_out <- df_list[[i]] %>% mutate(ClusterGroup = cluster$cluster)
-  
-  timeStep <- paste0(df_out$acquisitionDate[1] %>% str_sub(1,10),
-                     "_", 
-                     df_out$acquisitionDate[1] %>% str_sub(12,13),
-                     "_", 
-                     df_out$acquisitionDate[1] %>% str_sub(15,16))
-  
-  write.csv(df_out, paste0(workingDir, "ClusterAnalysis/DaySlicing/Cluster_5_", timeStep, ".csv"), row.names = F)
+  # df_out <- df_list[[i]] %>% mutate(ClusterGroup = cluster$cluster)
+  # 
+  # timeStep <- paste0(df_out$acquisitionDate[1] %>% str_sub(1,10),
+  #                    "_", 
+  #                    df_out$acquisitionDate[1] %>% str_sub(12,13),
+  #                    "_", 
+  #                    df_out$acquisitionDate[1] %>% str_sub(15,16))
+  # 
+  # write.csv(df_out, paste0(workingDir, "ClusterAnalysis/DaySlicing/Cluster_5_", timeStep, ".csv"), row.names = F)
   print(i)
 }
 

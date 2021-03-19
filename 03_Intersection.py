@@ -53,9 +53,9 @@ else:
 # msgList = [element for element in msgList if int(element[10:12]) < 21]
 
 #filter only 18.07.
-ctList = [element for element in ctList if element[9:11] == "20"]
-rdList = [element for element in rdList if element[14:16] == "20"]
-msgList = [element for element in msgList if element[10:12] == "20"]
+ctList = [element for element in ctList if element[9:11] == "22"]
+rdList = [element for element in rdList if element[14:16] == "22"]
+msgList = [element for element in msgList if element[10:12] == "22"]
 
 #------------------------------------------------------------------------------
 # 3 DATA INTERSECTION
