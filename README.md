@@ -1,10 +1,14 @@
 # Cloud Type and Precipitation Analysis
   *Master's Thesis Repository*
   
-  The repository scripts are used to extract cloud type and precipitation data. In subsequent steps, those data is intersected and analysed to extract a regression of cloud type vs. precipitation, and later to perform a cluster analysis.
+  The repository presents scripts that were used to extract cloud type, precipitation and cloud properties data. In subsequent steps, those information were intersected and analysed to identify possible interdependencies between cloud type and precipitation. This is done by first separating the precipitation by predefined cloud types. Second, a new unsupervised cloud type classification is performed, again, to separate the precipitation values. Analyzing the precipitation values within the defined classes allows to draw conclusions about the cloud type - precipitation relationship.  
 
 ## 1 Data
-  The date used is the cloud type (CT-product) from the CPP-product of the EUMETSAT CM-SAF, the RADOLAN precipitation data of the Deutscher Wetterdienst (DWD), the weather situation classification also of the DWD and the spectral information data of the EUMETSAT. 
+  The date used in the study is:
+- The **cloud type** (CT-product) from the CPP-product of the EUMETSAT CM-SAF
+- The **spectral information** data of the EUMETSAT
+- The RADOLAN **precipitation** data of the Deutscher Wetterdienst (DWD)
+- The **weather situation classification** of the DWD 
 
 ## 2 Preprocessing
   The original data, except for the weather situation classification is converted into the .tif format, retransformed into the same coordinate reference system (CRS) and reprojected to the same spatial resolution.
