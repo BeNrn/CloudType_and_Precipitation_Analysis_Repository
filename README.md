@@ -23,7 +23,8 @@
   To optimize the class delineation regarding the precipitation behavior, a cluster analysis is performed. It includes the spectral information and the precipitation distribution.
 Delineable rain events can be identified as the waether situation is used. Additionally, the continuity in the cluster delineation is used to identify data for a cross-scene analysis.
 
-https://github.com/BeNrn/CloudType_and_Precipitation_Analysis_Repository/tree/master/images
+#### Classified rainband propagation as product of the cluster analysis
+![Cluster propagation](./images/ClusterAnalysis.jpg)
 
 ## Sources
 - HEISTERMANN, M., JACOBI, S., & PFAFF, T. (2013). Technical Note: An open source library for processing weather radar data (wradlib). In Hydrology and Earth System Sciences (No.2; Hydrology and Earth System Sciences, Vol. 17, Number 2, pp. 863–871). Copernicus GmbH. 
