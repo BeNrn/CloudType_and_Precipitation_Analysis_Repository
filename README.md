@@ -11,7 +11,7 @@
 - The **weather situation classification** of the DWD 
 
 ## 2 Preprocessing
-  The original data, except for the weather situation classification is converted into the .tif format, retransformed into the same coordinate reference system (CRS) and reprojected to the same spatial resolution.
+  The original data, except for the weather situation classification is converted into the .tif format, retransformed into the same coordinate reference system (CRS) and reprojected to the same spatial and temporal resolution.
 
 ## 3 Intersection
   Subsequently, a spatial and temporal intersection is performed resulting in a *cloud attribute dataset*. 
