@@ -17,6 +17,8 @@
 ## Data sources
 - EUMETSAT CM-SAF CPP product
   - Schulz, J., Albert, P., Behr, H.-D., Caprion, D., Deneke, H., Dewitte, S., Dürr, B., Fuchs, P., Gratzki, A., Hechler, P., Hollmann, R., Johnston, S., Karlsson, K.-G., Manninen, T., Müller, R., Reuter, M., Riihelä, A., Roebeling, R., Selbach, N., Tetzlaff, A., Thomas, W., Werscheck, M., Wolters, E., & Zelenka, A. (2009). Operational climate monitoring from space: the EUMETSAT Satellite Application Facility on Climate Monitoring (CM-SAF). Atmospheric Chemistry and Physics, 9(5), 1687–1709.
+- Spectral EUMETSAT data
+  - MÜLLER, J. (2017). MSG Level 1.5 Image Data Format Description. EUMETSAT. 
 - RADOLAN Radar data product
   - WINTERRATH, T., BRENDEL, C., Hafer, M., JUNGHÄNEL, T., KLAMETH, A., LENGFELD, K., WALAWENDER, E., WEIGL, E., & BECKER, A. (2018). Radar climatology (RADKLIM) version 2017.002; gridded precipitation data for Germany. Deutscher Wetterdienst (DWD).
 - Weather situation classification
