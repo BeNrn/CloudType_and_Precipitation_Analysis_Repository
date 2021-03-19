@@ -4,16 +4,20 @@
   The repository scripts are used to extract cloud type and precipitation data. In subsequent steps, those data is intersected and analysed to extract a regression of cloud type vs. precipitation, and later to perform a cluster analysis.
 
 ## 1 Data
-  The date used is the cloud type from the CPP-product of the EUMETSAT CM-SAF and the RADOLAN data from the DWD.
+  The date used is the cloud type (CT-product) from the CPP-product of the EUMETSAT CM-SAF, the RADOLAN precipitation data of the Deutscher Wetterdienst (DWD), the weather situation classification also of the DWD and the spectral information data of the EUMETSAT. 
 
 ## 2 Preprocessing
-  The original data is converted into the .tif format, retransformed into the same coordinate reference system (CRS) and reprojected to the same spatial resolution.
+  The original data, except for the weather situation classification is converted into the .tif format, retransformed into the same coordinate reference system (CRS) and reprojected to the same spatial resolution.
 
 ## 3 Intersection
+  Subsequently, a spatial and temporal intersection is performed resulting in a *cloud attribute dataset*. 
 
 ## 4 Mean value examination
+  To analyze the dependencies between a predefined cloud type product and precipitation values the precipitation distribution within the discrete ct-product classes are analyzed. A Kruskal-Wallis test returns significant differences (alpha = 0.05) in the mean precipitation values within the individual cloud types. The post-hoc Dunn's test confirms the findings between all cloud types pairwise.
 
 ## 5 Cluster analysis
+  To optimize the class delineation regarding the precipitation behavior, a cluster analysis is performed. It includes the spectral information and the precipitation distribution.
+Delineable rain events can be identified as the waether situation is used. Additionally, the continuity in the cluster delineation is used to determine the possibility of cross-scene analysis.   
 
 ## Data sources
 - EUMETSAT CM-SAF CPP product
