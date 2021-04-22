@@ -25,8 +25,8 @@ library(cluster)
 #December: on the 30.12.
 
 #load one month 
-#month = "07"
-month = "12"
+month = "07"
+#month = "12"
 
 fileList <- list.files(paste0(workingDir, "Intersection_CT_RD/"))
 if(month == "07"){
@@ -44,10 +44,10 @@ df <- df[!is.na(df$precipitation),]
 #df <- df[df$precipitation != 0,]
 df <- df[df$precipitation > 0.01,]
 
-#remove cloudtypes that aren't interesting for precipitation study
-df <- df[!is.na(df$cloudType),] #NA
-df <- df[df$cloudType != 0,] #clear
-df <- df[df$cloudType != 7,] #cirrus
+# #remove cloudtypes that aren't interesting for precipitation study
+# df <- df[!is.na(df$cloudType),] #NA
+# df <- df[df$cloudType != 0,] #clear
+# df <- df[df$cloudType != 7,] #cirrus
 
 #-------------------------------------------------------------------------------
 #2 SLICING
@@ -101,21 +101,23 @@ for(i in 1:length(df_list)){
   #4,5,7
   
   #final cluster analysis
-  #cluster <- kmeans(smp, center = 5, nstart = 25)
-  #cluster <- kmeans(smp, center = 4, nstart = 25)
-  #save to disk
+  cluster <- kmeans(smp, center = 5, nstart = 25)
   
+  #overview:
   #smp %>% mutate(ClusterGroup = cluster$cluster) %>% group_by(ClusterGroup) %>% summarise_all("mean")
   
-  # df_out <- df_list[[i]] %>% mutate(ClusterGroup = cluster$cluster)
-  # 
-  # timeStep <- paste0(df_out$acquisitionDate[1] %>% str_sub(1,10),
-  #                    "_", 
-  #                    df_out$acquisitionDate[1] %>% str_sub(12,13),
-  #                    "_", 
-  #                    df_out$acquisitionDate[1] %>% str_sub(15,16))
-  # 
-  # write.csv(df_out, paste0(workingDir, "ClusterAnalysis/DaySlicing/Cluster_5_", timeStep, ".csv"), row.names = F)
+  #add the cluster group as a variable to the sample-df
+  df_out <- df_list[[i]] %>% mutate(ClusterGroup = cluster$cluster)
+  
+  #extract the timestep for naming the file
+  timeStep <- paste0(df_out$acquisitionDate[1] %>% str_sub(1,10),
+                    "_", 
+                    df_out$acquisitionDate[1] %>% str_sub(12,13),
+                    "_", 
+                    df_out$acquisitionDate[1] %>% str_sub(15,16))
+  
+  #save to disk
+  write.csv(df_out, paste0(workingDir, "ClusterAnalysis/DaySlicing/Cluster_5_", timeStep, ".csv"), row.names = F)
   print(i)
 }
 
@@ -124,12 +126,8 @@ for(i in 1:length(df_list)){
 #-------------------------------------------------------------------------------
 #only for chosen month and only 5-group-cluster
 list <- list.files(paste0(workingDir, "ClusterAnalysis/DaySlicing"))
-list <- list[str_sub(list,11,20) == "2017-12-30"]
-#list <- list[str_sub(list,11,20) == "2017-07-12"]
-
-list <- list[str_sub(list, 9,9) == "5"]
-
-sp::spTransform()
+#list <- list[str_sub(list,11,20) == "2017-12-30"]
+list <- list[str_sub(list,11,20) == "2017-07-12"]
 
 #iterate
 for(listelement in list){

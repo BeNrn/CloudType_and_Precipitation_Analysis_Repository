@@ -85,6 +85,7 @@ for(j in 1:length(list)){
 #month = "07"
 month = "12"
 
+
 #3.2 load the cluster groups
 #---------------------------
 clusGroup <- c("red", "green", "blue", "yellow", "grey")
@@ -93,6 +94,12 @@ clusGroup <- c("red", "green", "blue", "yellow", "grey")
 #------------------------------
 list <- list.files(paste0(dataDir, "DaySlicing_newGroups"))
 list <- list[str_sub(list, 24,25) == month]
+
+#December is split in two groups, only the group from 9-15 o'clock is clearly
+# separable
+if(month == "12"){
+  list <- list[1:25] 
+}
 
 #if there is an old df in memory
 rm(df_grps)
@@ -121,22 +128,22 @@ df_grps$group <- as.factor(df_grps$group)
 
 #rename the colors to new color palette
 if(month == "07"){
-  #red -> ochre
-  #green -> yellow
-  #blue -> grey
-  #yellow -> darkblue
-  #grey -> lightblue
+  #red -> darkblue
+  #green -> lightblue
+  #blue -> ochre
+  #yellow -> yellow
+  #grey -> grey
   
   #following the pattern: new = old
-  df_grps <- dplyr::mutate(df_grps, group = fct_recode(df_grps$group,"ochre" = "red", "yellow" = "green", "grey" = "blue", "darkblue" = "yellow", "lightblue" = "grey"))
+  df_grps <- dplyr::mutate(df_grps, group = fct_recode(df_grps$group,"ochre" = "blue", "yellow" = "yellow", "grey" = "red", "darkblue" = "grey", "lightblue" = "green"))
 }else if(month == "12"){
-  #red (orange) -> darkblue
-  #blue -> lightblue
-  #green -> yellow
-  #grey -> ochre
-  #yellow (turquoise) -> grey
+  #red -> grey
+  #blue -> ochre
+  #green -> lightblue
+  #grey -> darkblue
+  #yellow -> yellow
   
-  df_grps <- dplyr::mutate(df_grps, group = fct_recode(df_grps$group,"darkblue" = "red", "lightblue" = "blue", "yellow" = "green", "ochre" = "grey", "grey" = "yellow"))
+  df_grps <- dplyr::mutate(df_grps, group = fct_recode(df_grps$group,"darkblue" = "red", "lightblue" = "green", "yellow" = "yellow", "ochre" = "blue", "grey" = "grey"))
 }
 
 #3.4 Statistical evaluation
@@ -160,7 +167,7 @@ plot(df_grps$group, df_grps$precip,
 if(month == "12"){
   ggplot(df_grps, aes(x=group, y=precip, fill=group))+
     geom_violin(adjust = 1)+
-    scale_fill_manual(values = c("#586CC3", "#EBEA76","#BAC090", "#0044A3", "#8A97AA"))+
+    scale_fill_manual(values = c("#BAC090", "#586CC3", "#8A97AA", "#0044A3", "#EBEA76"))+
     stat_summary(fun=mean, geom="point", shape=3, size=5, color="red", fill="red")+
     theme(legend.position = "none")+
     scale_x_discrete(breaks = c("lightblue", "yellow", "ochre", "darkblue", "grey"),
@@ -171,7 +178,7 @@ if(month == "12"){
 }else if(month == "07"){
   ggplot(df_grps, aes(x=group, y=precip, fill=group))+
     geom_violin(adjust = 1)+
-    scale_fill_manual(values = c("#8A97AA", "#EBEA76","#586CC3", "#BAC090", "#0044A3"))+
+    scale_fill_manual(values = c("#BAC090","#586CC3","#0044A3", "#8A97AA", "#EBEA76"))+
     stat_summary(fun=mean, geom="point", shape=3, size=5, color="red", fill="red")+
     theme(legend.position = "none")+
     scale_x_discrete(breaks = c("lightblue", "yellow", "ochre", "darkblue", "grey"),
@@ -193,17 +200,17 @@ dunnResult
 
 #3.4.2.1 Results July
 #---------------------
-#   Comparison            Z           P.unadj      P.adj
-# 1       darkblue - grey -0.28956124 7.721519e-01 9.651899e-01
-# 2  darkblue - lightblue -0.07096725 9.434238e-01 9.434238e-01
-# 3      grey - lightblue  0.21139451 8.325794e-01 9.250883e-01
-# 4      darkblue - ochre -2.94255980 3.255109e-03 6.510218e-03
-# 5          grey - ochre -2.62664504 8.623123e-03 1.231875e-02
-# 6     lightblue - ochre -2.79169363 5.243298e-03 8.738829e-03
-# 7     darkblue - yellow  8.41898466 3.797611e-17 1.265870e-16
-# 8         grey - yellow  8.62421581 6.453332e-18 3.226666e-17
-# 9    lightblue - yellow  8.26645577 1.380002e-16 3.450006e-16
-# 10       ochre - yellow 11.24298862 2.507471e-29 2.507471e-28
+# Comparison               Z         P.unadj       P.adj
+# 1       darkblue - grey   28.47034 2.729445e-178 3.411806e-178
+# 2  darkblue - lightblue  100.83885  0.000000e+00  0.000000e+00
+# 3      grey - lightblue   69.77129  0.000000e+00  0.000000e+00
+# 4      darkblue - ochre  -36.91975 2.227717e-298 3.182453e-298
+# 5          grey - ochre  -62.81774  0.000000e+00  0.000000e+00
+# 6     lightblue - ochre -133.88356  0.000000e+00  0.000000e+00
+# 7     darkblue - yellow   15.31493  6.077759e-53  6.753065e-53
+# 8         grey - yellow  -12.50055  7.413880e-36  7.413880e-36
+# 9    lightblue - yellow  -82.06597  0.000000e+00  0.000000e+00
+# 10       ochre - yellow   49.79238  0.000000e+00  0.000000e+00
 
 print("ochre")
 summary(df_grps$precip[df_grps$group == "ochre"])
@@ -218,25 +225,25 @@ summary(df_grps$precip[df_grps$group == "lightblue"])
 
 
 # Min.   1st Qu. Median  Mean    3rd Qu. Max. 
-#0.01000 0.03678 0.08795 0.15652 0.20058 6.84922 ochre
-#0.01000 0.03360 0.08117 0.15516 0.19488 5.37895 yellow
-#0.01000 0.03635 0.08645 0.15285 0.19740 5.91566 grey
-#0.01000 0.03633 0.08604 0.15498 0.19765 5.28729 darkblue
-#0.01000 0.03518 0.08632 0.15867 0.20313 6.62324 lightblue
+#0.01000 0.04805 0.10630 0.17124 0.22454 5.28729 ochre
+#0.01000 0.03555 0.08308 0.15468 0.19667 5.82669 yellow
+#0.01000 0.03181 0.07770 0.15391 0.19431 5.91566 grey
+#0.01000 0.03994 0.09017 0.15941 0.19936 6.84922 darkblue
+#0.01000 0.02280 0.05077 0.11814 0.13053 6.62324 lightblue
 
 #3.4.2.1 Results December
 #-------------------------
-#   Comparison             Z          P.unadj       P.adj
-# 1       darkblue - grey -35.9343579 8.884280e-283 2.221070e-282
-# 2  darkblue - lightblue -19.1737395  6.133707e-82  1.022285e-81
-# 3      grey - lightblue  16.8661981  7.976811e-64  9.971014e-64
-# 4      darkblue - ochre  16.5446258  1.750490e-61  1.944989e-61
-# 5          grey - ochre  59.4865667  0.000000e+00  0.000000e+00
-# 6     lightblue - ochre  38.9761051  0.000000e+00  0.000000e+00
-# 7     darkblue - yellow  -0.2502198  8.024174e-01  8.024174e-01
-# 8         grey - yellow  39.6792192  0.000000e+00  0.000000e+00
-# 9    lightblue - yellow  20.7566772  1.066938e-95  2.133876e-95
-# 10       ochre - yellow -18.4875135  2.602824e-76  3.718320e-76
+# Comparison              Z           P.unadj       P.adj
+# 1       darkblue - grey -18.798708  7.737879e-79  1.105411e-78
+# 2  darkblue - lightblue -27.024485 7.621086e-161 1.524217e-160
+# 3      grey - lightblue  -6.765316  1.330187e-11  1.662734e-11
+# 4      darkblue - ochre -22.286458 5.000217e-110 8.333695e-110
+# 5          grey - ochre  -4.426943  9.557788e-06  1.061976e-05
+# 6     lightblue - ochre   1.669299  9.505822e-02  9.505822e-02
+# 7     darkblue - yellow -66.494017  0.000000e+00  0.000000e+00
+# 8         grey - yellow -45.729569  0.000000e+00  0.000000e+00
+# 9    lightblue - yellow -42.113579  0.000000e+00  0.000000e+00
+# 10       ochre - yellow -38.412842  0.000000e+00  0.000000e+00
 
 print("ochre")
 summary(df_grps$precip[df_grps$group == "ochre"])
@@ -249,12 +256,13 @@ summary(df_grps$precip[df_grps$group == "darkblue"])
 print("lightblue")
 summary(df_grps$precip[df_grps$group == "lightblue"])
 
+#9 - 15 Uhr
 # Min.    1st Qu. Median  Mean    3rd Qu. Max. 
-# 0.01000 0.02086 0.04148 0.06767 0.08363 1.10616 ochre
-# 0.01000 0.02717 0.05034 0.06947 0.08794 1.09407 yellow
-# 0.01000 0.03344 0.06810 0.09533 0.12454 0.92635 grey
-# 0.01000 0.02341 0.04890 0.07597 0.10045 0.99557 darkblue
-# 0.01000 0.02877 0.05839 0.08693 0.11420 1.05766 lightblue
+# 0.01000 0.02487 0.05173 0.07789 0.10377 1.05862 ochre
+# 0.01000 0.03464 0.07156 0.09760 0.12928 0.92635 yellow
+# 0.01000 0.02560 0.05068 0.07199 0.09420 0.89095 grey
+# 0.01000 0.02132 0.04213 0.06883 0.08433 1.10616 darkblue
+# 0.01000 0.02751 0.05251 0.07577 0.09652 1.09407 lightblue
 
 #3.4.3 Save results
 #------------------
