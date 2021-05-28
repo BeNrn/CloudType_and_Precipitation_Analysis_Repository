@@ -23,6 +23,7 @@ for(files in fileList){
   #remove zeros (zero precipitation is set to NA by python)
   df <- df[!is.na(df$precipitation),]
   #df <- df[df$precipitation != 0,]
+  #adjust no-precipitation setting
   df <- df[df$precipitation > 0.01,]
   
   #remove cloudtypes that aren't interesting for precipitation study
@@ -76,7 +77,7 @@ hist(df$precipitation)
 plot(df$cloudType, df$precipitation,
      xlab = "Wolkenklassen",
      ylab = "Niederschlag in mm",
-     main = paste0("Niederschlagswerte in den einzelnen Wolkenklassen\n(n = ", as.character(nrow(df)), ")\nDez17+1.-18.Jul. - 10.000 Sample pro Tag"),
+     main = paste0("Niederschlagswerte in den einzelnen Wolkenklassen\n(n = ", as.character(nrow(df)), ")\nDez. + Jul. - 10.000 Sample pro Tag"),
      log = "y",
      outline = F)
 
@@ -90,9 +91,9 @@ for(i in seq(1:length(unique(df$cloudType)))){
   title_name <- paste0("Cloud type ",ct_name, "\nn = ", as.character(length(df$precipitation[df$cloudType == ct_name])))
   #histogram
   hist(df$precipitation[df$cloudType == ct_name],
-       xlim = c(0,1), 
+       xlim = c(0,2), 
        main = title_name,
-       breaks = c(seq(0,10,0.1)),
+       breaks = c(seq(0,14,0.1)),
        labels = T,
        col = "lightblue")
   #boxplot
@@ -149,3 +150,6 @@ for(i in seq(1:length(unique(df$weather)))){
        outline = F)
 }
 par(op)
+
+#mean
+mean(df$precipitation[df$cloudType == "water"])

@@ -25,8 +25,8 @@ library(cluster)
 #December: on the 30.12.
 
 #load one month 
-month = "07"
-#month = "12"
+#month = "07"
+month = "12"
 
 fileList <- list.files(paste0(workingDir, "Intersection_CT_RD/"))
 if(month == "07"){
@@ -37,11 +37,11 @@ if(month == "07"){
 #load the df at the identified position
 df <- read.csv(paste0(workingDir, "Intersection_CT_RD/", df_file))[,-1]
 
-#round data to radolan accuracy of 1/10mm
-#df$precipitation <- round(df$precipitation, digits = 1)
 #remove zeros (zero precipitation is set to NA by python)
 df <- df[!is.na(df$precipitation),]
 #df <- df[df$precipitation != 0,]
+#RADOLAN accuracy: 1/10mm
+#all values smaller than 0.01 are apprx. = 0
 df <- df[df$precipitation > 0.01,]
 
 # #remove cloudtypes that aren't interesting for precipitation study

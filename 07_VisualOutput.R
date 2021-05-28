@@ -48,7 +48,7 @@ ggplot(data = df_colSlice)+
 #-------------------------------------------------------------------------------
 #3 CT-PRECIP MEAN VALUE ANALYSIS
 #-------------------------------------------------------------------------------
-df <- data.frame(group = c("Supercooled", "Opaque_ice", "Overlap", "Water", "Overshooting"), meanVal = c(0.1589, 0.1945, 0.2122, 0.2278, 0.4224))
+df <- data.frame(group = c("Supercooled", "Water", "Overlap", "Opaque_ice", "Overshooting"), meanVal = c(0.08534173, 0.1151635, 0.1466083, 0.1493126, 0.3674196))
 
 #avoid sorting by name by transforming the text into sorted factors
 df$group<- factor(df$group, levels = df$group)

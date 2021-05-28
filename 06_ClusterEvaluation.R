@@ -7,7 +7,6 @@ library(FSA)
 library(stringr)
 library(magrittr)
 library(forcats)
-library(stringr)
 library(ggplot2)
 
 #-------------------------------------------------------------------------------

@@ -47,10 +47,10 @@ else:
 #SPECIAL FOR PARTLY DATA INTERSECTION JULY 2017
 #----------------------------------------------
 #test for 01.07.2017
-#filter only 1. to 20.7.
-# ctList = [element for element in ctList if int(element[9:11]) < 21]
-# rdList = [element for element in rdList if int(element[14:16]) < 21]
-# msgList = [element for element in msgList if int(element[10:12]) < 21]
+#filter only 23. to 29.7.
+ctList = [element for element in ctList if int(element[9:11]) > 22]
+rdList = [element for element in rdList if int(element[14:16]) > 22]
+msgList = [element for element in msgList if int(element[10:12]) > 22]
 
 #filter only 18.07.
 ctList = [element for element in ctList if element[9:11] == "22"]
