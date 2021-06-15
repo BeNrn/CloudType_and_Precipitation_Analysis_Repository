@@ -37,10 +37,18 @@ for(files in fileList){
   #########################
   
   #draw a sample of the valid data values
-  #when there are less than 10000 entries take all of them 
+  #Moran's I test shows, that the null-hypothesis can be rejected for samples 
+  # somewhere between 300(p = 0,0001) and 250 (p = 0,095) pixels
+  #thus, valid sample number is found with 250 pixels 
   
-  if(nrow(df) > 10000){
-    df <- df[sample(1:nrow(df), 10000),]
+  #when there are less than 250 entries take all of them 
+  
+  # if(nrow(df) > 10000){
+  #   df <- df[sample(1:nrow(df), 10000),]
+  # }
+  
+  if(nrow(df) > 250){
+    df <- df[sample(1:nrow(df), 250),]
   }
   
   df$cloudType <- as.factor(df$cloudType)
@@ -153,3 +161,4 @@ par(op)
 
 #mean
 mean(df$precipitation[df$cloudType == "water"])
+

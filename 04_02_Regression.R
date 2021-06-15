@@ -29,10 +29,20 @@ for(file in fileList){
         df <- df[df$cloudType != 7,] #cirrus
         
         #draw a sample of the valid data values
-        #when there are less than 10000 entries take all of them 
-        if(nrow(df) > 10000){
-                df <- df[sample(1:nrow(df), 10000),]
+        #Moran's I test shows, that the null-hypothesis can be rejected for samples 
+        # somewhere between 300(p = 0,0001) and 250 (p = 0,095) pixels
+        #thus, valid sample number is found with 250 pixels 
+        
+        #when there are less than 250 entries take all of them 
+        
+        # if(nrow(df) > 10000){
+        #   df <- df[sample(1:nrow(df), 10000),]
+        # }
+        
+        if(nrow(df) > 250){
+                df <- df[sample(1:nrow(df), 250),]
         }
+        
         
         df$cloudType <- as.factor(df$cloudType)
         #rename the cloud types
@@ -220,6 +230,20 @@ dunnResult
 # 10        supercooled - water   1.729364 8.374403e-02 8.374403e-02
 
 #*... significant
+
+#if intensifly reduced n
+# Comparison                     Z         P.unadj       P.adj(Benjamini-Hochberg adjustmen)
+# 1        opaque_ice - overlap   1.6733632  9.425583e-02  1.047287e-01
+# 2   opaque_ice - overshooting -15.7318136  9.155083e-56  2.288771e-55*
+# 3      overlap - overshooting -14.3350539  1.321440e-46  2.642880e-46*
+# 4    opaque_ice - supercooled  21.7077130 1.734774e-104 8.673868e-104*
+# 5       overlap - supercooled  11.1597635  6.416205e-29  1.069368e-28*
+# 6  overshooting - supercooled  27.1539190 2.276096e-162 2.276096e-161*
+# 7          opaque_ice - water   9.2947949  1.474904e-20  2.107005e-20*
+# 8             overlap - water   7.1149684  1.119385e-12  1.399231e-12*
+# 9        overshooting - water  18.3511234  3.233573e-75  1.077858e-74*
+# 10        supercooled - water   0.5374891  5.909298e-01  5.909298e-01
+
 
 print("overlap")
 summary(df$precipitation[df$cloudType == "overlap"])
