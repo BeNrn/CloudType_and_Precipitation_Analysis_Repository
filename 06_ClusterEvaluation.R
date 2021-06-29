@@ -66,7 +66,7 @@ for(j in 1:length(list)){
                        df$acquisitionDate[1] %>% str_sub(12,13),
                        "_", 
                        df$acquisitionDate[1] %>% str_sub(15,16))
-      write.csv(df, paste0(dataDir, "/DaySlicing_NewGroups/Cluster_newGroups_", daytime, ".csv"), row.names = F)
+      #write.csv(df, paste0(dataDir, "/DaySlicing_NewGroups/Cluster_newGroups_", daytime, ".csv"), row.names = F)
       }
     }
 }
@@ -192,24 +192,25 @@ if(month == "12"){
 #--------------------
 #kruskal wallis test, if significance p < 0.05 -> significant differences
 kruskal.test(precip ~ group, data = df_grps)
+#Kruskal-Wallis chi-squared = 4824, df = 4, p-value < 2.2e-16
 
-#dunns test if kw-test is significant
+#dunns test if KW-test is significant
 dunnResult <- FSA::dunnTest(precip ~ group, data = df_grps, method = "bh")
 dunnResult
 
 #3.4.2.1 Results July
 #---------------------
 # Comparison               Z         P.unadj       P.adj
-# 1       darkblue - grey   28.47034 2.729445e-178 3.411806e-178
-# 2  darkblue - lightblue  100.83885  0.000000e+00  0.000000e+00
-# 3      grey - lightblue   69.77129  0.000000e+00  0.000000e+00
-# 4      darkblue - ochre  -36.91975 2.227717e-298 3.182453e-298
-# 5          grey - ochre  -62.81774  0.000000e+00  0.000000e+00
-# 6     lightblue - ochre -133.88356  0.000000e+00  0.000000e+00
-# 7     darkblue - yellow   15.31493  6.077759e-53  6.753065e-53
-# 8         grey - yellow  -12.50055  7.413880e-36  7.413880e-36
-# 9    lightblue - yellow  -82.06597  0.000000e+00  0.000000e+00
-# 10       ochre - yellow   49.79238  0.000000e+00  0.000000e+00
+# 1       darkblue - grey   28.47034 2.729445e-178 3.411806e-178*
+# 2  darkblue - lightblue  100.83885  0.000000e+00  0.000000e+00*
+# 3      grey - lightblue   69.77129  0.000000e+00  0.000000e+00*
+# 4      darkblue - ochre  -36.91975 2.227717e-298 3.182453e-298*
+# 5          grey - ochre  -62.81774  0.000000e+00  0.000000e+00*
+# 6     lightblue - ochre -133.88356  0.000000e+00  0.000000e+00*
+# 7     darkblue - yellow   15.31493  6.077759e-53  6.753065e-53*
+# 8         grey - yellow  -12.50055  7.413880e-36  7.413880e-36*
+# 9    lightblue - yellow  -82.06597  0.000000e+00  0.000000e+00*
+# 10       ochre - yellow   49.79238  0.000000e+00  0.000000e+00*
 
 print("ochre")
 summary(df_grps$precip[df_grps$group == "ochre"])
@@ -233,16 +234,16 @@ summary(df_grps$precip[df_grps$group == "lightblue"])
 #3.4.2.1 Results December
 #-------------------------
 # Comparison              Z           P.unadj       P.adj
-# 1       darkblue - grey -18.798708  7.737879e-79  1.105411e-78
-# 2  darkblue - lightblue -27.024485 7.621086e-161 1.524217e-160
-# 3      grey - lightblue  -6.765316  1.330187e-11  1.662734e-11
-# 4      darkblue - ochre -22.286458 5.000217e-110 8.333695e-110
-# 5          grey - ochre  -4.426943  9.557788e-06  1.061976e-05
+# 1       darkblue - grey -18.798708  7.737879e-79  1.105411e-78*
+# 2  darkblue - lightblue -27.024485 7.621086e-161 1.524217e-160*
+# 3      grey - lightblue  -6.765316  1.330187e-11  1.662734e-11*
+# 4      darkblue - ochre -22.286458 5.000217e-110 8.333695e-110*
+# 5          grey - ochre  -4.426943  9.557788e-06  1.061976e-05*
 # 6     lightblue - ochre   1.669299  9.505822e-02  9.505822e-02
-# 7     darkblue - yellow -66.494017  0.000000e+00  0.000000e+00
-# 8         grey - yellow -45.729569  0.000000e+00  0.000000e+00
-# 9    lightblue - yellow -42.113579  0.000000e+00  0.000000e+00
-# 10       ochre - yellow -38.412842  0.000000e+00  0.000000e+00
+# 7     darkblue - yellow -66.494017  0.000000e+00  0.000000e+00*
+# 8         grey - yellow -45.729569  0.000000e+00  0.000000e+00*
+# 9    lightblue - yellow -42.113579  0.000000e+00  0.000000e+00*
+# 10       ochre - yellow -38.412842  0.000000e+00  0.000000e+00*
 
 print("ochre")
 summary(df_grps$precip[df_grps$group == "ochre"])

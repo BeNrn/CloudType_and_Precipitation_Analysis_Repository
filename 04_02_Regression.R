@@ -28,17 +28,24 @@ for(file in fileList){
         df <- df[df$cloudType != 0,] #clear
         df <- df[df$cloudType != 7,] #cirrus
         
-        #draw a sample of the valid data values
+        #draw a sample of the valid data values based on Moran's I test
+        # df <- df[sample(1:nrow(df), 250),]
+        # distance <- as.matrix(dist(cbind(df_sample$lon, df_sample$lat)))
+        # distance <- 1/distance
+        # diag(distance) <- 0
+        # #removing infinity values
+        # distance[is.infinite(distance)] <- 0
+        # ape::Moran.I(df_sample$precipitation, distance)
+        # 300 -> p = 0,0001
+        # 250 -> p = 0,095
+        # 200 -> p = 0,12
+        # 100 -> p = 0,55
+        
         #Moran's I test shows, that the null-hypothesis can be rejected for samples 
         # somewhere between 300(p = 0,0001) and 250 (p = 0,095) pixels
-        #thus, valid sample number is found with 250 pixels 
+        #thus, a valid sample number is found with 250 pixels 
         
         #when there are less than 250 entries take all of them 
-        
-        # if(nrow(df) > 10000){
-        #   df <- df[sample(1:nrow(df), 10000),]
-        # }
-        
         if(nrow(df) > 250){
                 df <- df[sample(1:nrow(df), 250),]
         }
@@ -204,10 +211,12 @@ rm(df_sample, distance)
 # lines(range, y, type = "l", col = "red", lwd = 2)
 # 
 # rm(y, x, range, stdDev, alpha, beta)
+
 #-------------------------------------------------------------------------------
-#8 KRUSKAL-WALLIS-TEST
+#8 KRUSKAL-WALLIS-TEST AND DUNN'S TEST
 #-------------------------------------------------------------------------------
 kruskal.test(precipitation ~ cloudType, data = df)
+#Kruskal-Wallis chi-squared = 1076.8, df = 4, p-value < 2.2e-16
 #-> there are significant differences between the groups as p < 0.05
 
 dunnResult <- FSA::dunnTest(precipitation ~ cloudType, data = df, method = "bh")
@@ -215,8 +224,7 @@ dunnResult
 # "*" ...significant (p < 0.05)
 # "-" ...not significant
 
-#Dez:full
-#Jul: 1.-18.
+#for n = 10.000 samples
 # Comparison                     Z         P.unadj       P.adj(Benjamini-Hochberg adjustmen)
 # 1        opaque_ice - overlap  13.419472 4.650163e-41 5.166848e-41*
 # 2   opaque_ice - overshooting -96.142495 0.000000e+00 0.000000e+00*
@@ -231,7 +239,7 @@ dunnResult
 
 #*... significant
 
-#if intensifly reduced n
+#for n = 250 samples
 # Comparison                     Z         P.unadj       P.adj(Benjamini-Hochberg adjustmen)
 # 1        opaque_ice - overlap   1.6733632  9.425583e-02  1.047287e-01
 # 2   opaque_ice - overshooting -15.7318136  9.155083e-56  2.288771e-55*
@@ -244,7 +252,9 @@ dunnResult
 # 9        overshooting - water  18.3511234  3.233573e-75  1.077858e-74*
 # 10        supercooled - water   0.5374891  5.909298e-01  5.909298e-01
 
+#*... significant
 
+#mean values
 print("overlap")
 summary(df$precipitation[df$cloudType == "overlap"])
 print("opaque_ice")
@@ -256,7 +266,7 @@ summary(df$precipitation[df$cloudType == "overshooting"])
 print("water")
 summary(df$precipitation[df$cloudType == "water"])
 
-
+#comparison
 summary(df$precipitation[df$cloudType == "opaque_ice"])
 plot(df$cloudType[df$cloudType == "opaque_ice" | df$cloudType == "overlap"], 
      df$precipitation[df$cloudType == "opaque_ice" | df$cloudType == "overlap"],
